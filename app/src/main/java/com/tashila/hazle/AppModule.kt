@@ -6,6 +6,11 @@ import com.tashila.hazle.api.ApiService
 import com.tashila.hazle.api.ApiServiceImpl
 import com.tashila.hazle.db.MainDatabase
 import com.tashila.hazle.db.MessageDao
+import com.tashila.hazle.features.auth.AuthRepository
+import com.tashila.hazle.features.auth.AuthRepositoryImpl
+import com.tashila.hazle.features.auth.AuthViewModel
+import com.tashila.hazle.features.auth.TokenStorage
+import com.tashila.hazle.features.auth.TokenStorageImpl
 import com.tashila.hazle.features.chat.ChatRepository
 import com.tashila.hazle.features.chat.ChatRepositoryImpl
 import com.tashila.hazle.features.chat.ChatViewModel
@@ -26,13 +31,15 @@ val appModule = module {
     // Single instance of HttpClient
     single { provideHttpClient() }
 
-    // Single instance of ApiService, providing ApiServiceImpl and injecting HttpClient
     single<ApiService> { ApiServiceImpl(get()) } // 'get()' resolves HttpClient from Koin
+    single<TokenStorage> { TokenStorageImpl(androidApplication()) }
     single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
+    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
 
     // Room Database
     single { provideDatabase(get()) }
     single { provideMessageDao(get()) }
+    viewModel { AuthViewModel(get()) }
 
     viewModel { ChatViewModel(androidApplication(), get()) }
 }

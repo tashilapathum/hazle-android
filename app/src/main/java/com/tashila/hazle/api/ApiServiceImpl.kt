@@ -1,6 +1,9 @@
 package com.tashila.hazle.api
 
 import android.util.Log
+import com.tashila.hazle.features.auth.RefreshTokenRequest
+import com.tashila.hazle.features.auth.SupabaseSignInRequest
+import com.tashila.hazle.features.auth.SupabaseSignUpRequest
 import com.tashila.hazle.features.chat.Message
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -19,7 +22,7 @@ class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
         Log.i(TAG, "sendMessage: ${request.text}")
 
         return try {
-            httpClient.post("$SERVER_URL/chat") {
+            httpClient.post("${SERVER_URL}chat") {
                 contentType(ContentType.Application.Json) // Tell the server you're sending JSON
                 setBody(request) // Set the body to your MessageRequest object
             }
@@ -29,8 +32,30 @@ class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
         }
     }
 
+    override suspend fun signUp(request: SupabaseSignUpRequest): HttpResponse {
+        return httpClient.post("${SERVER_URL}auth/signup") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    override suspend fun signIn(request: SupabaseSignInRequest): HttpResponse {
+        return httpClient.post("${SERVER_URL}auth/signin") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    override suspend fun refreshToken(request: RefreshTokenRequest): HttpResponse {
+        return httpClient.post("${SERVER_URL}auth/refresh") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
     companion object {
         const val TAG = "ApiServiceImpl"
+
         //const val SERVER_URL = "http://10.0.2.2:8080/" // For Android Emulator
         const val SERVER_URL = "http://192.168.100.80:8080/" // Hutch wifi
         //const val SERVER_URL = "http://192.168.0.101:8080/" // Dialog wifi

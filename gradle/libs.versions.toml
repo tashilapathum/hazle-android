@@ -14,6 +14,10 @@ navigationCompose = "2.9.0"
 room = "2.7.1"
 ksp = "2.1.21-2.0.1"
 kotlinxDatetime = "0.6.0"
+securityCrypto = "1.1.0-beta01"
+datastorePref = "1.1.7"
+auth0-jwtdecode = "2.0.2"
+materialIcons = "1.7.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,7 +37,11 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-security-crypto = { module = "androidx.security:security-crypto-ktx", version.ref = "securityCrypto" }
+androidx-datastore-preferences= { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePref" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIcons" }
+
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
@@ -44,6 +52,7 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+auth0-jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "auth0-jwtdecode" }
 
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }

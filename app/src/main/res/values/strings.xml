@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Hazle</string>
     <string name="title_activity_text_receiver">TextReceiverActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
 </resources>

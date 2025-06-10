@@ -58,6 +58,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons)
+
+
+    implementation(libs.androidx.security.crypto)
+    implementation(libs.androidx.datastore.preferences)
 
     // Testing
     testImplementation(libs.junit)
@@ -78,6 +83,9 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    // Auth
+    implementation(libs.auth0.jwtdecode)
 
     // Room
     implementation(libs.room.runtime)
