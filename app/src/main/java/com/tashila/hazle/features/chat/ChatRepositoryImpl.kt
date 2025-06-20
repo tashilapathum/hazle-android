@@ -16,10 +16,6 @@ class ChatRepositoryImpl(
     private val threadDao: ThreadDao
 ) : ChatRepository {
 
-    override suspend fun getGreetingMessage(): HttpResponse {
-        return apiService.getGreeting()
-    }
-
     override suspend fun sendUserMessage(threadId: Long, newMessage: String): HttpResponse {
         val message = Message(
             id = System.now().toEpochMilliseconds(),

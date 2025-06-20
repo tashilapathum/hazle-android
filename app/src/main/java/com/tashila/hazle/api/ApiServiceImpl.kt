@@ -1,12 +1,12 @@
 package com.tashila.hazle.api
 
 import android.util.Log
+import com.tashila.hazle.BuildConfig
 import com.tashila.hazle.features.auth.RefreshTokenRequest
 import com.tashila.hazle.features.auth.SupabaseSignInRequest
 import com.tashila.hazle.features.auth.SupabaseSignUpRequest
 import com.tashila.hazle.features.chat.Message
 import io.ktor.client.HttpClient
-import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -14,9 +14,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
 class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
-    override suspend fun getGreeting(): HttpResponse {
-        return httpClient.get(SERVER_URL)
-    }
 
     override suspend fun sendMessage(request: Message): HttpResponse {
         Log.i(TAG, "sendMessage: ${request.text}")
@@ -55,11 +52,15 @@ class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
 
     companion object {
         const val TAG = "ApiServiceImpl"
+        val SERVER_URL = if (BuildConfig.DEBUG)
+            "http://192.168.100.80:8080/"
+        else
+            "https://api.hazle.tashila.me/"
 
-        //const val SERVER_URL = "http://10.0.2.2:8080/" // For Android Emulator
-        const val SERVER_URL = "http://192.168.100.80:8080/" // Hutch wifi
-        //const val SERVER_URL = "http://192.168.0.101:8080/" // Dialog wifi
-        //const val SERVER_URL = "https://hazle.onrender.com/" // Render deploy
-        //const val SERVER_URL = "https://api.hazle.tashila.me/" // Live deploy
+        // "http://10.0.2.2:8080/" // For Android Emulator
+        // "http://192.168.100.80:8080/" // Hutch wifi
+        // "http://192.168.0.101:8080/" // Dialog wifi
+        // "https://hazle.onrender.com/" // Render deploy
+        // "https://api.hazle.tashila.me/" // Live deploy
     }
 }

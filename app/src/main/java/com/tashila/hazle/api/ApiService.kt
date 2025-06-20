@@ -7,7 +7,6 @@ import com.tashila.hazle.features.chat.Message
 import io.ktor.client.statement.HttpResponse
 
 interface ApiService {
-    suspend fun getGreeting(): HttpResponse
     suspend fun sendMessage(request: Message): HttpResponse
     suspend fun signUp(request: SupabaseSignUpRequest): HttpResponse
     suspend fun signIn(request: SupabaseSignInRequest): HttpResponse

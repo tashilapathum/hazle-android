@@ -8,13 +8,14 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,13 +30,14 @@ class ChatViewModel(
 
     // Messages flow, now dependent on the activeThreadId
     @OptIn(ExperimentalCoroutinesApi::class)
-    val messages: StateFlow<List<Message>> = _activeThreadId.flatMapLatest { threadId ->
+    private val _messages: StateFlow<List<Message>> = _activeThreadId.flatMapLatest { threadId ->
         if (threadId != null) {
             chatRepository.getChatMessages(threadId) // Pass the threadId
         } else {
-            emptyFlow() // No active thread, no messages
+            getGreeting()
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val messages: StateFlow<List<Message>> = _messages
 
     private val _currentMessage = MutableStateFlow("")
     val currentMessage: StateFlow<String> = _currentMessage
@@ -53,10 +55,7 @@ class ChatViewModel(
     val closeChat = _closeChat.asSharedFlow()
 
     init {
-        // Observe _activeThreadId to automatically load messages
-        // This is handled by the `messages` StateFlow using `flatMapLatest`
-        // You might want to load the last active thread here, or prompt the user to create/select one.
-        // For now, it will start with no active thread.
+        _chatSubtitle.value = getRandomMessagePrompt()
     }
 
     // Function to update the current message text
@@ -96,8 +95,8 @@ class ChatViewModel(
         _activeThreadId.value = null // Clear active thread, a new one will be created on next message
         _currentMessage.value = "" // Clear any input
         _errorMessage.value = "" // Clear any errors
-        _chatSubtitle.value = getRandomMessagePrompt()
-        // messages flow will become empty if activeThreadId is null
+        _chatTitle.value = "New chat"
+        _chatSubtitle.value = "What's up?"
         Log.d(TAG, "Starting a new chat.")
     }
 
@@ -117,7 +116,6 @@ class ChatViewModel(
                 // threadRepository.deleteThread(threadId)
                 // _activeThreadId.value = null // If thread is deleted, clear active
             }
-            Log.d(TAG, "Resetting chat for active thread.")
         }
     }
 
@@ -134,7 +132,6 @@ class ChatViewModel(
                 if (response.status.isSuccess()) {
                     // `storeAiMessage` now takes `threadId`
                     chatRepository.storeAiMessage(threadId, response.bodyAsText())
-                    Log.i(TAG, "sendMessageInternal: AI response stored for thread $threadId.")
                     _chatSubtitle.value = getRandomMessagePrompt()
                 } else {
                     _errorMessage.value = "Failed to send: ${response.status.value} - ${response.bodyAsText()}"
@@ -149,7 +146,14 @@ class ChatViewModel(
         }
     }
 
-    fun getRandomMessagePrompt(): String {
+    private fun getGreeting(): Flow<List<Message>> {
+        return flowOf(listOf(Message(
+            text = "Hi, I'm Hazle, your AI assistant. I'll always try to give concise answers.",
+            isFromMe = false
+        )))
+    }
+
+    private fun getRandomMessagePrompt(): String {
         val prompts = listOf(
             "What's up?",
             "Followup?",

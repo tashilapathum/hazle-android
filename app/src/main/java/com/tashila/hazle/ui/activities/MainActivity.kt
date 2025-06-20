@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -69,15 +68,12 @@ class MainActivity : ComponentActivity() {
 
                         // When coming from notification
                         passedThreadId = intent.getLongExtra(EXTRA_MESSAGE_THREAD_ID, -1L)
-                        Log.i(TAG, "onCreate: RECEIVED_THREAD: $passedThreadId")
                         LaunchedEffect(key1 = passedThreadId) {
                             if (passedThreadId != -1L) {
-                                // Optional: Check if already on the destination to prevent unnecessary navigation
                                 val targetRoute = AppDestinations.chatDetailRoute(passedThreadId)
                                 if (navController.currentDestination?.route != targetRoute) {
                                     chatViewModel.setActiveThread(passedThreadId)
                                     navController.navigate(targetRoute) {
-                                        // Optional: Adjust back stack behavior
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
