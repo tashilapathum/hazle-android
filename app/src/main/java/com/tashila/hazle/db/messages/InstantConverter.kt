@@ -1,4 +1,4 @@
-package com.tashila.hazle.db
+package com.tashila.hazle.db.messages
 
 import androidx.room.TypeConverter
 import kotlinx.datetime.Instant

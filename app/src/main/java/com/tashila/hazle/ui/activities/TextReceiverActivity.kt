@@ -5,9 +5,15 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.lifecycle.lifecycleScope
 import com.tashila.hazle.features.notifications.ForegroundApiService
+import com.tashila.hazle.features.thread.ThreadRepository
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class TextReceiverActivity : ComponentActivity() {
+class TextReceiverActivity : ComponentActivity(), KoinComponent {
+    private val threadRepository: ThreadRepository by inject()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,7 +22,7 @@ class TextReceiverActivity : ComponentActivity() {
     }
 
     private fun processRequest() {
-        Toast.makeText(this, "Sending to Hazle...", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Sent to Hazle. You'll receive the reply via a notification.", Toast.LENGTH_LONG).show()
         val messageContent: String? = when (intent.action) {
             Intent.ACTION_PROCESS_TEXT -> {
                 // For "Process text" from text selection menu
@@ -30,8 +36,12 @@ class TextReceiverActivity : ComponentActivity() {
         }
 
         if (messageContent.isNullOrBlank().not()) {
-            ForegroundApiService.Companion.startService(this, messageContent)
+            lifecycleScope.launch {
+                // Always create a new thread for new received text
+                val threadId = threadRepository.createThread(messageContent)
+                ForegroundApiService.Companion.startService(this@TextReceiverActivity, threadId, messageContent)
+            }
         }
-        finish() // Finish the activity instantly
+        finish()
     }
 }

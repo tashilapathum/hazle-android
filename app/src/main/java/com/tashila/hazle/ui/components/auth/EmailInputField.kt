@@ -1,4 +1,4 @@
-package com.tashila.hazle.ui.components
+package com.tashila.hazle.ui.components.auth
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

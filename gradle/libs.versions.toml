@@ -9,15 +9,16 @@ espressoCore = "3.6.1"
 ktor = "3.1.3"
 lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2025.06.00"
+composeBom = "2025.06.01"
 navigationCompose = "2.9.0"
-room = "2.7.1"
+room = "2.7.2"
 ksp = "2.1.21-2.0.1"
 kotlinxDatetime = "0.6.0"
 securityCrypto = "1.1.0-beta01"
 datastorePref = "1.1.7"
 auth0-jwtdecode = "2.0.2"
 materialIcons = "1.7.8"
+foundation = "1.8.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,7 @@ androidx-security-crypto = { module = "androidx.security:security-crypto-ktx", v
 androidx-datastore-preferences= { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePref" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIcons" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 

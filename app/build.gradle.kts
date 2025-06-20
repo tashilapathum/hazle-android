@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.tashila.hazle"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons)
+    implementation(libs.androidx.compose.foundation)
 
 
     implementation(libs.androidx.security.crypto)

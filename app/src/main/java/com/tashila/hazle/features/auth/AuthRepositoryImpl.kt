@@ -39,7 +39,7 @@ class AuthRepositoryImpl(
                     }
                 } catch (jsonParseE: Exception) {
                     Log.e("AuthRepoImpl", "Failed to parse backend error response for sign-in. Raw: $responseBody. Error: ${jsonParseE.message}", jsonParseE)
-                    Result.failure(AuthException.ServerError("Sign-in failed: Unexpected error format from server."))
+                    Result.failure(AuthException.ServerError("Sign-in failed: Unexpected error from server."))
                 }
             }
         } catch (e: Exception) {
@@ -67,7 +67,7 @@ class AuthRepositoryImpl(
                     }
                 } catch (jsonParseE: Exception) {
                     Log.e("AuthRepoImpl", "Failed to parse backend error response. Raw: $responseBody. Error: ${jsonParseE.message}", jsonParseE)
-                    Result.failure(AuthException.ServerError("Signup failed: Unexpected error format from server."))
+                    Result.failure(AuthException.ServerError("Signup failed: Unexpected error from server."))
                 }
             }
         } catch (e: Exception) {
@@ -80,7 +80,6 @@ class AuthRepositoryImpl(
         val refreshToken = tokenStorage.getRefreshToken()
 
         if (accessToken == null || refreshToken == null) {
-            Log.i("AuthRepoImpl", "No tokens found, not authenticated.")
             return false
         }
 
@@ -89,7 +88,6 @@ class AuthRepositoryImpl(
             val expiresAt = jwt.expiresAt
 
             if (expiresAt == null || expiresAt.before(Date())) {
-                Log.i("AuthRepoImpl", "Access token expired, attempting to refresh...")
                 try {
                     val response: HttpResponse = authApiService.refreshToken(RefreshTokenRequest(refreshToken))
                     val responseBody = response.bodyAsText()
@@ -97,7 +95,6 @@ class AuthRepositoryImpl(
                     if (response.status.isSuccess()) {
                         val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
                         tokenStorage.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
-                        Log.i("AuthRepoImpl", "Token refreshed successfully.")
                         return true
                     } else {
                         try {
@@ -112,16 +109,15 @@ class AuthRepositoryImpl(
                         }
                     }
                 } catch (e: Exception) {
-                    Log.e("AuthRepoImpl", "Network error during token refresh: ${e.message}. Clearing auth data.", e)
+                    Log.e(TAG, "isAuthenticated", e)
                     tokenStorage.clearTokens()
                     return false
                 }
             } else {
-                Log.i("AuthRepoImpl", "Access token is valid.")
                 return true
             }
         } catch (e: Exception) {
-            Log.e("AuthRepoImpl", "Error validating access token or other JWT issue: ${e.message}. Clearing auth data.", e)
+            Log.e(TAG, "isAuthenticated", e)
             tokenStorage.clearTokens()
             return false
         }
@@ -129,5 +125,9 @@ class AuthRepositoryImpl(
 
     override fun clearAuthData() {
         tokenStorage.clearTokens()
+    }
+
+    companion object {
+        const val TAG = "AuthRepositoryImpl"
     }
 }

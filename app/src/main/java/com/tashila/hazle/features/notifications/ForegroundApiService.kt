@@ -3,9 +3,10 @@ package com.tashila.hazle.features.notifications
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.tashila.hazle.MyApplication.Companion.FOREGROUND_NOTIFICATION_CHANNEL_ID
 import com.tashila.hazle.R
 import com.tashila.hazle.features.chat.ChatRepository
@@ -14,6 +15,8 @@ import io.ktor.http.isSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -23,77 +26,111 @@ class ForegroundApiService : Service(), KoinComponent {
     private val chatRepository: ChatRepository by inject()
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
+    private lateinit var notificationManager: NotificationManagerCompat
+
+    // A counter for active requests
+    private var activeRequestCount = 0
+    private val stopServiceSignal = Channel<Unit>(Channel.CONFLATED) // Use a channel to signal completion
 
     companion object {
-        const val FOREGROUND_NOTIFICATION_ID = 100 // Unique ID for the foreground notification
+        const val TAG = "ForegroundApiService"
+        const val FOREGROUND_NOTIFICATION_ID = 100
+        const val EXTRA_THREAD_ID = "extra_thread_id"
         const val EXTRA_MESSAGE_CONTENT = "extra_message_content"
 
-        // Helper to start this service
-        fun startService(context: Context, messageContent: String) {
+        fun startService(context: Context, threadId: Long, messageContent: String) {
             val intent = Intent(context, ForegroundApiService::class.java).apply {
+                putExtra(EXTRA_THREAD_ID, threadId)
                 putExtra(EXTRA_MESSAGE_CONTENT, messageContent)
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+            context.startForegroundService(intent)
+        }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        notificationManager = NotificationManagerCompat.from(this)
+        // Start a coroutine that waits for the signal to stop the service
+        serviceScope.launch {
+            stopServiceSignal.receiveAsFlow().collect {
+                // This block will be executed when Unit is sent to the channel
+                // We'll update the notification and then stop the service.
+                Log.i(TAG, "onStartCommand: STOPPING service via signal")
+                notificationManager.cancel(FOREGROUND_NOTIFICATION_ID)
+                stopSelf() // Stop the foreground service
             }
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val messageContent = intent?.getStringExtra(EXTRA_MESSAGE_CONTENT)
+        val threadId = intent?.getLongExtra(EXTRA_THREAD_ID, -1L) ?: -1L
 
-        // Show initial "working" notification to start as a foreground service
-        val notification = NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
+        val initialNotification = NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Processing Request")
             .setContentText("Your message is being sent...")
-            .setSmallIcon(R.drawable.ic_logo) // Use a relevant icon from your `res/drawable`
+            .setSmallIcon(R.drawable.ic_logo)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setOngoing(true) // Makes it an ongoing notification
+            .setOngoing(true)
             .build()
 
-        startForeground(FOREGROUND_NOTIFICATION_ID, notification)
+        startForeground(FOREGROUND_NOTIFICATION_ID, initialNotification)
 
         if (messageContent.isNullOrBlank().not()) {
+            activeRequestCount++ // Increment before launching the coroutine
+            Log.i(TAG, "onStartCommand: LAUNCHED new request, activeRequestCount: $activeRequestCount")
+
             serviceScope.launch {
                 try {
-                    val response = chatRepository.sendUserMessage(messageContent)
+                    val response = chatRepository.sendUserMessage(threadId, messageContent)
                     val title = messageContent
                     val msg = if (response.status.isSuccess()) {
-                        chatRepository.storeAiMessage(response.bodyAsText())
+                        chatRepository.storeAiMessage(threadId, response.bodyAsText())
                         response.bodyAsText()
                     } else {
                         "Server error: ${response.status.value}"
                     }
 
-                    // Use your existing NotificationService to show the final result
                     NotificationService.startService(
-                        applicationContext, // Pass context to your existing NotificationService
-                        title, msg
+                        applicationContext,
+                        title, msg, threadId
                     )
                 } catch (e: Exception) {
                     NotificationService.startService(
                         applicationContext,
                         "Message Failed!",
-                        "Error: ${e.localizedMessage ?: "Unknown error"}"
+                        "Error: ${e.localizedMessage ?: "Unknown error"}",
+                        threadId
                     )
                 } finally {
-                    stopSelf() // Stop the foreground service when done
+                    activeRequestCount-- // Decrement when a request finishes
+                    Log.i(TAG, "onStartCommand: REQUEST COMPLETED, activeRequestCount: $activeRequestCount")
+                    if (activeRequestCount == 0) {
+                        // All tasks are done, signal the service to stop
+                        stopServiceSignal.trySend(Unit).isSuccess // Non-blocking send
+                    }
                 }
             }
         } else {
-            stopSelf() // Stop if no message content provided
+            Log.i(TAG, "onStartCommand: No message content, activeRequestCount: $activeRequestCount")
+            // If no message content provided, and no other active jobs, stop immediately
+            if (activeRequestCount == 0) { // Check active count
+                stopServiceSignal.trySend(Unit).isSuccess
+            }
         }
 
-        return START_NOT_STICKY // Service won't restart if killed by system
+        return START_NOT_STICKY
     }
+
     override fun onBind(intent: Intent?): IBinder? {
-        return null // Not a bound service
+        return null
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.i(TAG, "onDestroy: Service destroyed")
         serviceJob.cancel() // Cancel coroutine scope to clean up resources
+        stopServiceSignal.close() // Close the channel
+        notificationManager.cancel(FOREGROUND_NOTIFICATION_ID) // Ensure notification is cleared
     }
 }

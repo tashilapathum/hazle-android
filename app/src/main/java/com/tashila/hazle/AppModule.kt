@@ -5,7 +5,8 @@ import androidx.room.Room
 import com.tashila.hazle.api.ApiService
 import com.tashila.hazle.api.ApiServiceImpl
 import com.tashila.hazle.db.MainDatabase
-import com.tashila.hazle.db.MessageDao
+import com.tashila.hazle.db.messages.MessageDao
+import com.tashila.hazle.db.threads.ThreadDao
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.auth.AuthRepositoryImpl
 import com.tashila.hazle.features.auth.AuthViewModel
@@ -14,6 +15,9 @@ import com.tashila.hazle.features.auth.TokenStorageImpl
 import com.tashila.hazle.features.chat.ChatRepository
 import com.tashila.hazle.features.chat.ChatRepositoryImpl
 import com.tashila.hazle.features.chat.ChatViewModel
+import com.tashila.hazle.features.thread.ThreadRepository
+import com.tashila.hazle.features.thread.ThreadRepositoryImpl
+import com.tashila.hazle.features.thread.ThreadsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -33,15 +37,19 @@ val appModule = module {
 
     single<ApiService> { ApiServiceImpl(get()) } // 'get()' resolves HttpClient from Koin
     single<TokenStorage> { TokenStorageImpl(androidApplication()) }
-    single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
+    single<ChatRepository> { ChatRepositoryImpl(get(), get(), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
+    single<ThreadRepository> { ThreadRepositoryImpl(get()) }
 
     // Room Database
     single { provideDatabase(get()) }
     single { provideMessageDao(get()) }
-    viewModel { AuthViewModel(get()) }
+    single { provideThreadDao(get()) }
 
-    viewModel { ChatViewModel(androidApplication(), get()) }
+    // View Models
+    viewModel { AuthViewModel(get()) }
+    viewModel { ThreadsViewModel(get()) }
+    viewModel { ChatViewModel(get(), get()) }
 }
 
 fun provideHttpClient(): HttpClient {
@@ -55,7 +63,7 @@ fun provideHttpClient(): HttpClient {
         }
         install(Logging) {
             logger = Logger.ANDROID
-            level = LogLevel.ALL
+            level = LogLevel.ALL // TODO
         }
     }
 }
@@ -72,4 +80,8 @@ fun provideDatabase(application: Application): MainDatabase {
 
 fun provideMessageDao(database: MainDatabase): MessageDao {
     return database.messageDao()
+}
+
+fun provideThreadDao(database: MainDatabase): ThreadDao {
+    return database.threadDao()
 }

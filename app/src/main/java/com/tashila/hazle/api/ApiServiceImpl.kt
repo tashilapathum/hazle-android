@@ -59,5 +59,7 @@ class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
         //const val SERVER_URL = "http://10.0.2.2:8080/" // For Android Emulator
         const val SERVER_URL = "http://192.168.100.80:8080/" // Hutch wifi
         //const val SERVER_URL = "http://192.168.0.101:8080/" // Dialog wifi
+        //const val SERVER_URL = "https://hazle.onrender.com/" // Render deploy
+        //const val SERVER_URL = "https://api.hazle.tashila.me/" // Live deploy
     }
 }

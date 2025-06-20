@@ -21,9 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.tashila.hazle.ui.components.EmailInputField
-import com.tashila.hazle.ui.components.LogoText
-import com.tashila.hazle.ui.components.PasswordInputField
+import com.tashila.hazle.ui.components.auth.EmailInputField
+import com.tashila.hazle.ui.components.auth.LogoText
+import com.tashila.hazle.ui.components.auth.PasswordInputField
 
 @Composable
 fun LoginScreen(

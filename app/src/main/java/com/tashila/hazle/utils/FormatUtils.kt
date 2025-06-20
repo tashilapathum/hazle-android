@@ -1,4 +1,4 @@
-package com.tashila.hazle.data
+package com.tashila.hazle.utils
 
 import android.icu.text.DateFormat
 import kotlinx.datetime.Instant

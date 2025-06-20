@@ -1,9 +1,8 @@
-package com.tashila.hazle.ui.components
+package com.tashila.hazle.ui.components.chat
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,13 +30,11 @@ fun ChatInputBar(
     onSendClick: () -> Unit
 ) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding(), // Add padding for navigation bar
-        shadowElevation = 8.dp
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)
     ) {
         Row(
-            modifier = Modifier.padding(all = 16.dp),
+            modifier = Modifier.padding(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(

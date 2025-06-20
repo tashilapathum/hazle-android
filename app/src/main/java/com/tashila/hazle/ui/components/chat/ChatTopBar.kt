@@ -1,5 +1,11 @@
-package com.tashila.hazle.ui.components
+package com.tashila.hazle.ui.components.chat
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,7 +26,7 @@ import androidx.compose.ui.unit.dp
 
 
 /**
- * @param chatName The name of the AI (e.g., "Gemini", "ChatGPT", "Assistant").
+ * @param chatTitle The name of the AI (e.g., "Gemini", "ChatGPT", "Assistant").
  * @param onBackClick Lambda to execute when the back button is clicked.
  * @param onNewChatClick Lambda to execute when the "New Chat" or "Reset" button is clicked.
  * @param onInfoClick Lambda to execute when the "Info" or "Settings" button is clicked.
@@ -29,7 +35,8 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatTopBar(
-    chatName: String,
+    chatTitle: String,
+    chatSubtitle: String,
     onBackClick: () -> Unit,
     onNewChatClick: () -> Unit,
     onInfoClick: () -> Unit,
@@ -39,16 +46,24 @@ fun ChatTopBar(
         title = {
             Column {
                 Text(
-                    text = chatName,
+                    text = chatTitle,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(
-                    text = "Your intelligent assistant",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                AnimatedContent(
+                    targetState = chatSubtitle,
+                    transitionSpec = {
+                        (slideInVertically { height -> height } + fadeIn()) togetherWith
+                                (slideOutVertically { height -> -height } + fadeOut())
+                    }
+                ) { targetChatSubtitle ->
+                    Text(
+                        text = targetChatSubtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         },
         navigationIcon = {
@@ -79,7 +94,7 @@ fun ChatTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             actionIconContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface,

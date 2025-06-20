@@ -10,16 +10,16 @@ class NotificationReplyReceiver : BroadcastReceiver() {
     companion object {
         const val KEY_TEXT_REPLY = "key_text_reply" // Key for the remote input
         const val ACTION_REPLY = "com.tashila.hazle.ACTION_NOTIFICATION_REPLY"
-        const val EXTRA_ORIGINAL_MESSAGE_ID = "extra_original_message_id" // To identify which conversation to reply to
+        const val EXTRA_THREAD_ID = "extra_thread_id" // To identify which conversation to reply to
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTION_REPLY) {
             val replyText = getMessageText(intent)
-            val notificationId = intent.getIntExtra(EXTRA_ORIGINAL_MESSAGE_ID, -1)
+            val threadId = intent.getLongExtra(EXTRA_THREAD_ID, -1L)
 
             if (replyText != null && replyText.isNotBlank()) {
-                ForegroundApiService.startService(context, replyText.toString())
+                ForegroundApiService.startService(context, threadId, replyText.toString())
             }
         }
     }

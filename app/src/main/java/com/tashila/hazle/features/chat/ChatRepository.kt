@@ -5,9 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
     suspend fun getGreetingMessage(): HttpResponse
-    suspend fun sendUserMessage(message: String): HttpResponse
-    suspend fun storeAiMessage(message: String)
-    fun getChatMessages(): Flow<List<Message>>
-    suspend fun getMessageTexts(): List<String>
-    suspend fun deleteAllMessages()
+    suspend fun sendUserMessage(threadId: Long, message: String): HttpResponse
+    suspend fun storeAiMessage(threadId: Long, message: String)
+    fun getChatMessages(threadId: Long): Flow<List<Message>>
+    suspend fun deleteAllMessages(threadId: Long)
 }

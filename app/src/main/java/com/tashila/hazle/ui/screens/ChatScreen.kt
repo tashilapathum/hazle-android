@@ -1,6 +1,6 @@
 package com.tashila.hazle.ui.screens
 
-import android.app.Activity
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,24 +22,36 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.tashila.hazle.features.chat.ChatViewModel
-import com.tashila.hazle.ui.components.ChatInputBar
-import com.tashila.hazle.ui.components.ChatMessageBubble
-import com.tashila.hazle.ui.components.ChatTopBar
+import com.tashila.hazle.ui.components.chat.ChatInputBar
+import com.tashila.hazle.ui.components.chat.ChatMessageBubble
+import com.tashila.hazle.ui.components.chat.ChatTopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun ChatScreen(viewModel: ChatViewModel) {
+fun ChatScreen(
+    onCloseChat: () -> Unit,
+    viewModel: ChatViewModel,
+    initialThreadId: Long?
+) {
+    LaunchedEffect(initialThreadId) {
+        if (initialThreadId != null && initialThreadId != -1L) {
+            viewModel.setActiveThread(initialThreadId)
+        } else {
+            viewModel.setActiveThread(null)
+        }
+    }
     val messages by viewModel.messages.collectAsState()
     val currentMessage by viewModel.currentMessage.collectAsState()
+    val chatTitle by viewModel.chatTitle.collectAsState()
+    val chatSubtitle by viewModel.chatSubtitle.collectAsState()
     val listState = rememberLazyListState()
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val activity = LocalLifecycleOwner.current as Activity
     var showInfoDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
 
@@ -50,7 +62,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
     LaunchedEffect(Unit) {
         viewModel.closeChat.collect {
-            activity.finish()
+            onCloseChat.invoke()
         }
     }
 
@@ -58,7 +70,8 @@ fun ChatScreen(viewModel: ChatViewModel) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ChatTopBar(
-                chatName = "Hazle",
+                chatTitle = chatTitle,
+                chatSubtitle = chatSubtitle,
                 onBackClick = { viewModel.closeChat() },
                 onNewChatClick = { showResetDialog = true },
                 onInfoClick = { showInfoDialog = true },
@@ -74,7 +87,8 @@ fun ChatScreen(viewModel: ChatViewModel) {
                     keyboardController?.hide() // Hide keyboard on send
                 }
             )
-        }
+        },
+        containerColor = Color.Transparent
     ) { paddingValues ->
         LazyColumn(
             state = listState,
@@ -84,7 +98,10 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(messages) { message ->
+            items(
+                items = messages,
+                key = { message -> message.id }
+            ) { message ->
                 ChatMessageBubble(message = message)
             }
         }
