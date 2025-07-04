@@ -5,7 +5,8 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.tashila.hazle.db.threads.ThreadEntity
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Entity(
     tableName = "messages",
@@ -19,6 +20,7 @@ import kotlinx.datetime.Instant
     // Add an index for faster lookups by threadId
     indices = [Index(value = ["threadId"])]
 )
+@OptIn(ExperimentalTime::class)
 data class MessageEntity(
     @PrimaryKey val id: Long, // Message ID (e.g., timestamp from API)
     val threadId: Long, // Foreign key linking to ThreadEntity

@@ -8,8 +8,10 @@ import com.tashila.hazle.db.threads.ThreadDao
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock.System
+import kotlin.time.Clock.System
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class ChatRepositoryImpl(
     private val apiService: ApiService,
     private val messageDao: MessageDao,

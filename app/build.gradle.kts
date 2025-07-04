@@ -41,11 +41,14 @@ android {
         compose = true
         buildConfig = true
     }
+    kotlin {
+        sourceSets.all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
+        }
+    }
 }
 
 dependencies {
-    implementation(libs.kotlinx.datetime)
-
     // Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -86,6 +89,11 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    implementation(libs.kotlinx.datetime)
+
+    // Coil
+    implementation(libs.coil.compose)
 
     // Auth
     implementation(libs.auth0.jwtdecode)

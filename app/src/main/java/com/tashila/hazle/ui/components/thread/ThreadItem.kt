@@ -41,11 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.tashila.hazle.db.threads.ThreadEntity
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.datetime.toLocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import com.tashila.hazle.utils.toTimeString
 import kotlin.random.Random
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -59,16 +55,6 @@ fun ThreadItem(
     onTogglePinClick: (ThreadEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val formattedLastMessageTime = remember(thread.lastMessageTime) {
-        if (thread.lastMessageTime != null) {
-            val localDateTime = thread.lastMessageTime.toLocalDateTime(TimeZone.currentSystemDefault())
-            val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
-            formatter.format(localDateTime.toJavaLocalDateTime())
-        } else {
-            "" // No last message time
-        }
-    }
-
     val interactionSource = remember { MutableInteractionSource() }
     var showContextMenu by remember { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
@@ -142,15 +128,13 @@ fun ThreadItem(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
-                    if (formattedLastMessageTime.isNotBlank()) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = formattedLastMessageTime,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = textColor.copy(alpha = 0.7f),
-                            modifier = Modifier.align(Alignment.Top)
-                        )
-                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = thread.lastMessageTime?.toTimeString() ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = textColor.copy(alpha = 0.7f),
+                        modifier = Modifier.align(Alignment.Top)
+                    )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(

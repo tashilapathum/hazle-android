@@ -13,8 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Clock
 import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 // Helper data class for each aurora "blob"
 private data class AuroraBlob(
@@ -23,6 +24,7 @@ private data class AuroraBlob(
     val baseColor: Color
 )
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun AuroraBackground(modifier: Modifier = Modifier) {
     val isDarkTheme = isSystemInDarkTheme()

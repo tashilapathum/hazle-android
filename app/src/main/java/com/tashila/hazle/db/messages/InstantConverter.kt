@@ -1,8 +1,10 @@
 package com.tashila.hazle.db.messages
 
 import androidx.room.TypeConverter
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 class InstantConverter {
     @TypeConverter
     fun fromTimestamp(value: Long?): Instant? {

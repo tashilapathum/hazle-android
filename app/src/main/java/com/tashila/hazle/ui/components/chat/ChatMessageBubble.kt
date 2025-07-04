@@ -26,7 +26,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tashila.hazle.features.chat.Message
-import com.tashila.hazle.utils.toReadableString
+import com.tashila.hazle.utils.toDateTimeString
 
 @Composable
 fun ChatMessageBubble(
@@ -128,7 +128,7 @@ fun ChatMessageBubble(
             }
 
             Text(
-                text = message.timestamp.toReadableString(),
+                text = message.timestamp.toDateTimeString(),
                 color = textColor.copy(alpha = 0.6f),
                 fontSize = 10.sp,
                 modifier = Modifier.padding(top = 4.dp)
