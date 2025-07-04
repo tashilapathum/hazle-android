@@ -78,7 +78,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
                 authRepository.signIn(request)
                     .onSuccess { authResponse ->
                         _authEvent.emit(AuthEvent.LoginSuccess)
-                        Log.i(TAG, "Login successful for ${authResponse.user.email}")
+                        Log.i(TAG, "Login successful")
                     }
                     .onFailure { exception ->
                         // Display specific error message from the repository or a generic one

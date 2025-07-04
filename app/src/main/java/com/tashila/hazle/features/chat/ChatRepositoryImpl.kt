@@ -16,17 +16,17 @@ class ChatRepositoryImpl(
     private val threadDao: ThreadDao
 ) : ChatRepository {
 
-    override suspend fun sendUserMessage(threadId: Long, newMessage: String): HttpResponse {
-        val message = Message(
+    override suspend fun sendUserMessage(threadId: Long, message: String): HttpResponse {
+        val newMessage = Message(
             id = System.now().toEpochMilliseconds(),
-            text = newMessage.trim(),
+            text = message.trim(),
             isFromMe = true,
             timestamp = System.now()
         )
 
-        messageDao.insertMessage(message.toEntity(threadId))
-        updateThread(message, threadId)
-        return apiService.sendMessage(message)
+        messageDao.insertMessage(newMessage.toEntity(threadId))
+        updateThread(newMessage, threadId)
+        return apiService.sendMessage(newMessage)
     }
 
     override suspend fun storeAiMessage(threadId: Long, message: String) {
@@ -56,7 +56,7 @@ class ChatRepositoryImpl(
     }
 
     override suspend fun deleteAllMessages(threadId: Long) {
-        messageDao.deleteAllMessagesByThreadId(threadId) // You'll need a new DAO method for this.
+        messageDao.deleteAllMessagesByThreadId(threadId)
     }
 
     companion object {

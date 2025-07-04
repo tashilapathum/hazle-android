@@ -2,7 +2,7 @@ package com.tashila.hazle.features.auth
 
 import android.util.Log
 import com.auth0.android.jwt.JWT
-import com.tashila.hazle.api.ApiService
+import com.tashila.hazle.api.AuthApiService
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -11,8 +11,8 @@ import kotlinx.serialization.json.Json
 import java.util.Date
 
 class AuthRepositoryImpl(
-    private val authApiService: ApiService,
-    private val tokenStorage: TokenStorage
+    private val authApiService: AuthApiService,
+    private val tokenRepository: TokenRepository
 ) : AuthRepository {
     private val jsonDecoder = Json {
         ignoreUnknownKeys = true
@@ -26,7 +26,7 @@ class AuthRepositoryImpl(
 
             if (response.status.isSuccess()) {
                 val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
-                tokenStorage.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
+                tokenRepository.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
                 Result.success(parsedResponse)
             } else {
                 try {
@@ -53,7 +53,7 @@ class AuthRepositoryImpl(
             val responseBody = response.bodyAsText()
             if (response.status.isSuccess()) {
                 val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
-                tokenStorage.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
+                tokenRepository.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
                 Result.success(parsedResponse)
             } else { // If the response indicates an error (non-2xx status code)
                 try {
@@ -76,8 +76,8 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun isAuthenticated(): Boolean {
-        val accessToken = tokenStorage.getAccessToken()
-        val refreshToken = tokenStorage.getRefreshToken()
+        val accessToken = tokenRepository.getAccessToken()
+        val refreshToken = tokenRepository.getRefreshToken()
 
         if (accessToken == null || refreshToken == null) {
             return false
@@ -87,44 +87,48 @@ class AuthRepositoryImpl(
             val jwt = JWT(accessToken)
             val expiresAt = jwt.expiresAt
 
-            if (expiresAt == null || expiresAt.before(Date())) {
-                try {
-                    val response: HttpResponse = authApiService.refreshToken(RefreshTokenRequest(refreshToken))
-                    val responseBody = response.bodyAsText()
-
-                    if (response.status.isSuccess()) {
-                        val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
-                        tokenStorage.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
-                        return true
-                    } else {
-                        try {
-                            val backendError = jsonDecoder.decodeFromString<BackendErrorMessage>(responseBody)
-                            Log.e("AuthRepoImpl", "Token refresh failed: ${response.status.value}: ${backendError.message}. Clearing auth data.")
-                            tokenStorage.clearTokens()
-                            return false
-                        } catch (jsonParseE: Exception) {
-                            Log.e("AuthRepoImpl", "Failed to parse backend error response for token refresh. Raw: $responseBody. Error: ${jsonParseE.message}", jsonParseE)
-                            tokenStorage.clearTokens()
-                            return false
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "isAuthenticated", e)
-                    tokenStorage.clearTokens()
-                    return false
-                }
+            return if (expiresAt == null || expiresAt.before(Date())) {
+                refresh(refreshToken)
             } else {
-                return true
+                true
             }
         } catch (e: Exception) {
-            Log.e(TAG, "isAuthenticated", e)
-            tokenStorage.clearTokens()
+            Log.e(TAG, "Error while processing JWT. Clearing tokens.", e)
+            tokenRepository.clearTokens()
             return false
         }
     }
 
-    override fun clearAuthData() {
-        tokenStorage.clearTokens()
+    override suspend fun refresh(refreshToken: String): Boolean {
+        return try {
+            val response: HttpResponse = authApiService.refreshToken(RefreshTokenRequest(refreshToken))
+            val responseBody = response.bodyAsText()
+
+            if (response.status.isSuccess()) {
+                val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
+                tokenRepository.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
+                true
+            } else {
+                try {
+                    val backendError = jsonDecoder.decodeFromString<BackendErrorMessage>(responseBody)
+                    Log.e(TAG, "Token refresh failed: ${response.status.value}: ${backendError.message}. Clearing auth data.")
+                    tokenRepository.clearTokens()
+                    false
+                } catch (jsonParseE: Exception) {
+                    Log.e(TAG, "Failed to parse backend error response for token refresh. Raw: $responseBody. Error: ${jsonParseE.message}", jsonParseE)
+                    tokenRepository.clearTokens()
+                    false
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Token refresh request failed.", e)
+            tokenRepository.clearTokens()
+            false
+        }
+    }
+
+    override suspend fun clearAuthData() {
+        tokenRepository.clearTokens()
     }
 
     companion object {
