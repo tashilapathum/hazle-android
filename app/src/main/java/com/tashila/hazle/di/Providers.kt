@@ -1,25 +1,12 @@
-package com.tashila.hazle
+package com.tashila.hazle.di
 
 import android.app.Application
 import androidx.room.Room
-import com.tashila.hazle.api.ApiService
-import com.tashila.hazle.api.ApiServiceImpl
-import com.tashila.hazle.api.AuthApiService
-import com.tashila.hazle.api.AuthApiServiceImpl
 import com.tashila.hazle.db.MainDatabase
 import com.tashila.hazle.db.messages.MessageDao
 import com.tashila.hazle.db.threads.ThreadDao
 import com.tashila.hazle.features.auth.AuthRepository
-import com.tashila.hazle.features.auth.AuthRepositoryImpl
-import com.tashila.hazle.features.auth.AuthViewModel
 import com.tashila.hazle.features.auth.TokenRepository
-import com.tashila.hazle.features.auth.TokenRepositoryImpl
-import com.tashila.hazle.features.chat.ChatRepository
-import com.tashila.hazle.features.chat.ChatRepositoryImpl
-import com.tashila.hazle.features.chat.ChatViewModel
-import com.tashila.hazle.features.thread.ThreadRepository
-import com.tashila.hazle.features.thread.ThreadRepositoryImpl
-import com.tashila.hazle.features.thread.ThreadsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.auth.Auth
@@ -32,36 +19,6 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import org.koin.android.ext.koin.androidApplication
-import org.koin.core.module.dsl.viewModel
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
-
-val appModule = module {
-    // --- HttpClient Providers ---
-    single(named("AuthHttpClient")) { provideHttpClient() } // Dedicated HttpClient for Auth calls (NO Auth plugin)
-    single { provideAuthenticatedHttpClient(get(), get()) } // Main HttpClient for other API calls (WITH Auth plugin)
-
-    // --- API Service Providers ---
-    single<AuthApiService> { AuthApiServiceImpl(get(named("AuthHttpClient"))) }
-    single<ApiService> { ApiServiceImpl(get()) } // 'get()' resolves the non-named HttpClient
-
-    // --- Repository Providers ---
-    single<TokenRepository> { TokenRepositoryImpl(androidApplication()) }
-    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
-    single<ChatRepository> { ChatRepositoryImpl(get(), get(), get()) }
-    single<ThreadRepository> { ThreadRepositoryImpl(get()) }
-
-    // --- Room Database ---
-    single { provideDatabase(get()) }
-    single { provideMessageDao(get()) }
-    single { provideThreadDao(get()) }
-
-    // --- View Models ---
-    viewModel { AuthViewModel(get()) }
-    viewModel { ThreadsViewModel(get()) }
-    viewModel { ChatViewModel(get(), get()) }
-}
 
 // Dedicated HttpClient for Auth calls (without Auth plugin to avoid circular dependencies)
 fun provideHttpClient(): HttpClient {
@@ -160,4 +117,3 @@ fun provideThreadDao(database: MainDatabase): ThreadDao {
     return database.threadDao()
 }
 
-private const val TAG = "AppModule"

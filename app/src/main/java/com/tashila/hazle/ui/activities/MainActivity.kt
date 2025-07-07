@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,7 +26,7 @@ import com.tashila.hazle.features.notifications.NotificationService.Companion.EX
 import com.tashila.hazle.ui.components.AuroraBackground
 import com.tashila.hazle.ui.components.PermissionRequester
 import com.tashila.hazle.ui.navigation.AppDestinations
-import com.tashila.hazle.ui.navigation.ChatNavHost
+import com.tashila.hazle.ui.navigation.MainNavHost
 import com.tashila.hazle.ui.theme.HazleTheme
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -33,10 +34,26 @@ import org.koin.compose.koinInject
 class MainActivity : ComponentActivity() {
     private var passedThreadId by mutableLongStateOf(-1L)
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             HazleTheme {
+                val context = LocalContext.current
+                val authRepository: AuthRepository = koinInject()
+                val navController = rememberNavController() // Create NavController here
+                val chatViewModel: ChatViewModel = koinViewModel() // Get shared ChatViewModel
+
+                LaunchedEffect(Unit) {
+                    if (authRepository.isAuthenticated().not()) {
+                        val intent = Intent(context, LoginActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        context.startActivity(intent)
+                        (context as? Activity)?.finish()
+                        return@LaunchedEffect
+                    }
+                }
+
                 Box(modifier = Modifier.fillMaxSize()) {
                     Surface(modifier = Modifier.fillMaxSize()) {
                         AuroraBackground(modifier = Modifier.fillMaxSize())
@@ -45,23 +62,8 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = Color.Transparent
                     ) {
-                        val context = LocalContext.current
-                        val authRepository: AuthRepository = koinInject()
-
-                        LaunchedEffect(Unit) {
-                            if (authRepository.isAuthenticated().not()) {
-                                val intent = Intent(context, LoginActivity::class.java)
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                context.startActivity(intent)
-                                (context as? Activity)?.finish()
-                                return@LaunchedEffect
-                            }
-                        }
-
-                        val navController = rememberNavController() // Create NavController here
-                        val chatViewModel: ChatViewModel = koinViewModel() // Get shared ChatViewModel
-
-                        ChatNavHost(
+                        // Your existing NavHost and notification logic
+                        MainNavHost(
                             navController = navController,
                             chatViewModel = chatViewModel
                         )
@@ -74,7 +76,9 @@ class MainActivity : ComponentActivity() {
                                 if (navController.currentDestination?.route != targetRoute) {
                                     chatViewModel.setActiveThread(passedThreadId)
                                     navController.navigate(targetRoute) {
-                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            inclusive = false
+                                        }
                                         launchSingleTop = true
                                     }
                                 }
@@ -86,10 +90,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
     companion object {
         const val TAG = "MainActivity"
     }
 }
+
 
 @Composable
 fun RequestNotificationPermission() {

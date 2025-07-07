@@ -25,12 +25,13 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatInputBar(
+    modifier: Modifier = Modifier,
     text: String,
     onTextChange: (String) -> Unit,
     onSendClick: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)
     ) {
         Row(

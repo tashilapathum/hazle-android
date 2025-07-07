@@ -1,4 +1,6 @@
-package com.tashila.hazle
+package com.tashila.hazle.utils
+
+import com.tashila.hazle.BuildConfig
 
 val SERVER_URL = if (BuildConfig.DEBUG)
     "http://192.168.100.80:8080/"

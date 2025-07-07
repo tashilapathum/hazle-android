@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,9 +28,7 @@ import androidx.compose.ui.unit.dp
 /**
  * @param chatTitle The name of the AI (e.g., "Gemini", "ChatGPT", "Assistant").
  * @param onBackClick Lambda to execute when the back button is clicked.
- * @param onNewChatClick Lambda to execute when the "New Chat" or "Reset" button is clicked.
  * @param onInfoClick Lambda to execute when the "Info" or "Settings" button is clicked.
- * @param scrollBehavior Optional: Provides a scroll behavior for dynamic elevation.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,9 +36,7 @@ fun ChatTopBar(
     chatTitle: String,
     chatSubtitle: String,
     onBackClick: () -> Unit,
-    onNewChatClick: () -> Unit,
     onInfoClick: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
         title = {
@@ -80,15 +75,6 @@ fun ChatTopBar(
             }
         },
         actions = {
-            // Reset Conversation button
-            IconButton(onClick = onNewChatClick) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "Start new chat",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            // AI Info button
             IconButton(onClick = onInfoClick) {
                 Icon(
                     imageVector = Icons.Filled.Info,
@@ -104,6 +90,5 @@ fun ChatTopBar(
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
             scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
         ),
-        scrollBehavior = scrollBehavior
     )
 }

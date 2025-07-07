@@ -12,8 +12,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,8 +20,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.tashila.hazle.features.chat.ChatViewModel
@@ -38,22 +37,23 @@ fun ChatScreen(
     viewModel: ChatViewModel,
     initialThreadId: Long?
 ) {
-    LaunchedEffect(initialThreadId) {
-        if (initialThreadId != null && initialThreadId != -1L) {
-            viewModel.setActiveThread(initialThreadId)
-        } else {
-            viewModel.setActiveThread(null)
-        }
-    }
     val messages by viewModel.messages.collectAsState()
     val currentMessage by viewModel.currentMessage.collectAsState()
     val chatTitle by viewModel.chatTitle.collectAsState()
     val chatSubtitle by viewModel.chatSubtitle.collectAsState()
     val listState = rememberLazyListState()
     val keyboardController = LocalSoftwareKeyboardController.current
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var showInfoDialog by remember { mutableStateOf(false) }
-    var showResetDialog by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(initialThreadId) {
+        if (initialThreadId != null && initialThreadId != -1L) {
+            viewModel.setActiveThread(initialThreadId)
+        } else { // for new chat
+            viewModel.setActiveThread(null)
+            focusRequester.requestFocus()
+        }
+    }
 
     // Automatically scroll to the bottom when new messages arrive
     LaunchedEffect(messages.size) {
@@ -67,19 +67,17 @@ fun ChatScreen(
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ChatTopBar(
                 chatTitle = chatTitle,
                 chatSubtitle = chatSubtitle,
                 onBackClick = { viewModel.closeChat() },
-                onNewChatClick = { showResetDialog = true },
                 onInfoClick = { showInfoDialog = true },
-                scrollBehavior = scrollBehavior
             )
         },
         bottomBar = {
             ChatInputBar(
+                modifier =  Modifier.focusRequester(focusRequester),
                 text = currentMessage,
                 onTextChange = { viewModel.onMessageChange(it) },
                 onSendClick = {
@@ -115,29 +113,6 @@ fun ChatScreen(
             confirmButton = {
                 TextButton (onClick = { showInfoDialog = false }) {
                     Text("OK")
-                }
-            }
-        )
-    }
-
-    if (showResetDialog) {
-        AlertDialog(
-            onDismissRequest = { showResetDialog = false },
-            title = { Text("Confirm") },
-            text = { Text("Are you sure you want to reset the chat? All messages will be deleted. This action cannot be undone.") },
-            confirmButton = {
-                TextButton (onClick = {
-                    showResetDialog = false
-                    viewModel.resetChat()
-                }) {
-                    Text("Yes")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showResetDialog = false
-                }) {
-                    Text("No")
                 }
             }
         )

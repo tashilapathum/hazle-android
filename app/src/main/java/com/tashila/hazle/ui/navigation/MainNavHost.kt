@@ -10,11 +10,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tashila.hazle.features.chat.ChatViewModel
 import com.tashila.hazle.ui.screens.ChatScreen
+import com.tashila.hazle.ui.screens.SettingsScreen
 import com.tashila.hazle.ui.screens.ThreadsScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ChatNavHost(
+fun MainNavHost(
     navController: NavHostController,
     chatViewModel: ChatViewModel
 ) {
@@ -48,6 +49,9 @@ fun ChatNavHost(
     ) {
         composable(AppDestinations.THREADS_ROUTE) {
             ThreadsScreen(
+                onClickSettings = {
+                    navController.navigate(AppDestinations.SETTINGS_ROUTE)
+                },
                 onCreateNewChat = {
                     // When creating a new chat, pass -1L to signify no existing thread ID
                     chatViewModel.startNewChat()
@@ -77,6 +81,13 @@ fun ChatNavHost(
                 },
                 viewModel = chatViewModel,
                 initialThreadId = threadId
+            )
+        }
+        composable(AppDestinations.SETTINGS_ROUTE) {
+            SettingsScreen(
+                onBackClicked = {
+                    navController.popBackStack()
+                }
             )
         }
     }

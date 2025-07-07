@@ -3,6 +3,7 @@ package com.tashila.hazle
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import com.tashila.hazle.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
