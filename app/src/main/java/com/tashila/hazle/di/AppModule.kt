@@ -26,6 +26,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     // --- HttpClient Providers ---
+    single { provideJsonDecoder() }
     single(named("AuthHttpClient")) { provideHttpClient() } // Dedicated HttpClient for Auth calls (NO Auth plugin)
     single { provideAuthenticatedHttpClient(get(), get()) } // Main HttpClient for other API calls (WITH Auth plugin)
 
@@ -39,8 +40,8 @@ val appModule = module {
 
     // --- Repository Providers ---
     single<TokenRepository> { TokenRepositoryImpl(androidApplication()) }
-    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
-    single<ChatRepository> { ChatRepositoryImpl(get(), get(), get()) }
+    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
+    single<ChatRepository> { ChatRepositoryImpl(get(), get(), get(), get()) }
     single<ThreadRepository> { ThreadRepositoryImpl(get()) }
     single<SettingsRepository> { SettingsRepositoryImpl(androidContext()) }
 

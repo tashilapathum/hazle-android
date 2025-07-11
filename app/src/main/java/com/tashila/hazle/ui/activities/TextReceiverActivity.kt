@@ -38,8 +38,8 @@ class TextReceiverActivity : ComponentActivity(), KoinComponent {
         if (messageContent.isNullOrBlank().not()) {
             lifecycleScope.launch {
                 // Always create a new thread for new received text
-                val threadId = threadRepository.createThread(messageContent)
-                ForegroundApiService.Companion.startService(this@TextReceiverActivity, threadId, messageContent)
+                val localThreadId = threadRepository.createThread(messageContent)
+                ForegroundApiService.Companion.startService(this@TextReceiverActivity, localThreadId, messageContent)
             }
         }
         finish()

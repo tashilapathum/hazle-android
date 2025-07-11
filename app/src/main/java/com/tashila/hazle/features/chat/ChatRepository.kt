@@ -1,11 +1,10 @@
 package com.tashila.hazle.features.chat
 
-import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-    suspend fun sendUserMessage(threadId: Long, message: String): HttpResponse
-    suspend fun storeAiMessage(threadId: Long, message: String)
-    fun getChatMessages(threadId: Long): Flow<List<Message>>
-    suspend fun deleteAllMessages(threadId: Long)
+    suspend fun sendUserMessage(localThreadId: Long, aiThreadId: String? = null, message: String): String
+    suspend fun storeAiMessage(localThreadId: Long, message: Message)
+    fun getChatMessages(localThreadId: Long): Flow<List<Message>>
+    suspend fun deleteAllMessages(localThreadId: Long)
 }

@@ -10,8 +10,6 @@ import androidx.core.app.NotificationManagerCompat
 import com.tashila.hazle.MyApplication.Companion.FOREGROUND_NOTIFICATION_CHANNEL_ID
 import com.tashila.hazle.R
 import com.tashila.hazle.features.chat.ChatRepository
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,9 +36,9 @@ class ForegroundApiService : Service(), KoinComponent {
         const val EXTRA_THREAD_ID = "extra_thread_id"
         const val EXTRA_MESSAGE_CONTENT = "extra_message_content"
 
-        fun startService(context: Context, threadId: Long, messageContent: String) {
+        fun startService(context: Context, localThreadId: Long, messageContent: String) {
             val intent = Intent(context, ForegroundApiService::class.java).apply {
-                putExtra(EXTRA_THREAD_ID, threadId)
+                putExtra(EXTRA_THREAD_ID, localThreadId)
                 putExtra(EXTRA_MESSAGE_CONTENT, messageContent)
             }
             context.startForegroundService(intent)
@@ -64,7 +62,7 @@ class ForegroundApiService : Service(), KoinComponent {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val messageContent = intent?.getStringExtra(EXTRA_MESSAGE_CONTENT)
-        val threadId = intent?.getLongExtra(EXTRA_THREAD_ID, -1L) ?: -1L
+        val localThreadId = intent?.getLongExtra(EXTRA_THREAD_ID, -1L) ?: -1L
 
         val initialNotification = NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Processing Request")
@@ -82,25 +80,22 @@ class ForegroundApiService : Service(), KoinComponent {
 
             serviceScope.launch {
                 try {
-                    val response = chatRepository.sendUserMessage(threadId, messageContent)
+                    val message = chatRepository.sendUserMessage(
+                        localThreadId = localThreadId,
+                        message = messageContent
+                    )
                     val title = messageContent
-                    val msg = if (response.status.isSuccess()) {
-                        chatRepository.storeAiMessage(threadId, response.bodyAsText())
-                        response.bodyAsText()
-                    } else {
-                        "Server error: ${response.status.value}"
-                    }
 
                     NotificationService.startService(
                         applicationContext,
-                        title, msg, threadId
+                        title, message, localThreadId
                     )
                 } catch (e: Exception) {
                     NotificationService.startService(
                         applicationContext,
                         "Message Failed!",
                         "Error: ${e.localizedMessage ?: "Unknown error"}",
-                        threadId
+                        localThreadId
                     )
                 } finally {
                     activeRequestCount-- // Decrement when a request finishes

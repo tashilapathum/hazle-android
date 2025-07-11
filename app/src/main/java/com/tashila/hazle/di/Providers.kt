@@ -20,15 +20,19 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
+fun provideJsonDecoder(): Json {
+    return Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        prettyPrint = true
+    }
+}
+
 // Dedicated HttpClient for Auth calls (without Auth plugin to avoid circular dependencies)
 fun provideHttpClient(): HttpClient {
     return HttpClient(Android) {
         install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-                isLenient = true
-            })
+            json(provideJsonDecoder())
         }
         install(Logging) {
             logger = Logger.ANDROID
@@ -44,11 +48,7 @@ fun provideAuthenticatedHttpClient(
 ): HttpClient {
     return HttpClient(Android) {
         install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-                isLenient = true
-            })
+            json(provideJsonDecoder())
         }
         install(Logging) {
             logger = Logger.ANDROID

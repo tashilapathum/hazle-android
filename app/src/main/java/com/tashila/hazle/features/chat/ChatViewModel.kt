@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tashila.hazle.features.thread.ThreadRepository
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -26,13 +24,14 @@ class ChatViewModel(
 
     // The active thread ID, managed by the ViewModel
     private val _activeThreadId = MutableStateFlow<Long?>(null)
+    private val _activeAiThreadId = MutableStateFlow<String?>(null)
     val activeThreadId: StateFlow<Long?> = _activeThreadId
 
     // Messages flow, now dependent on the activeThreadId
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _messages: StateFlow<List<Message>> = _activeThreadId.flatMapLatest { threadId ->
-        if (threadId != null) {
-            chatRepository.getChatMessages(threadId) // Pass the threadId
+    private val _messages: StateFlow<List<Message>> = _activeThreadId.flatMapLatest { localThreadId ->
+        if (localThreadId != null) {
+            chatRepository.getChatMessages(localThreadId) // Pass the localThreadId
         } else {
             getGreeting()
         }
@@ -42,7 +41,7 @@ class ChatViewModel(
     private val _currentMessage = MutableStateFlow("")
     val currentMessage: StateFlow<String> = _currentMessage
 
-    private val _chatTitle = MutableStateFlow("")
+    private val _chatTitle = MutableStateFlow("Chat with Hazle")
     val chatTitle: StateFlow<String> = _chatTitle
 
     private val _chatSubtitle = MutableStateFlow("")
@@ -93,6 +92,7 @@ class ChatViewModel(
     // Function to start a new chat (which effectively means creating a new thread)
     fun startNewChat() {
         _activeThreadId.value = null // Clear active thread, a new one will be created on next message
+        _activeAiThreadId.value = null
         _currentMessage.value = "" // Clear any input
         _errorMessage.value = "" // Clear any errors
         _chatTitle.value = "New chat"
@@ -100,21 +100,15 @@ class ChatViewModel(
         Log.d(TAG, "Starting a new chat.")
     }
 
-    fun setActiveThread(threadId: Long?) {
+    fun setActiveThread(localThreadId: Long?) {
         viewModelScope.launch {
-            _activeThreadId.value = threadId
-            if (threadId != null)
-                _chatTitle.value = threadRepository.getThreadById(threadId)?.name ?: "Chat with Hazle"
-        }
-    }
-
-    fun resetChat() {
-        viewModelScope.launch {
-            _activeThreadId.value?.let { threadId ->
-                chatRepository.deleteAllMessages(threadId) // Delete messages for the active thread
-                // You might also want to delete the thread itself, depending on your app's logic
-                // threadRepository.deleteThread(threadId)
-                // _activeThreadId.value = null // If thread is deleted, clear active
+            _activeThreadId.value = localThreadId
+            if (localThreadId != null) {
+                val thread = threadRepository.getThreadById(localThreadId)
+                thread?.let {
+                    _chatTitle.value = it.name
+                    _activeAiThreadId.value = it.aiThreadId
+                }
             }
         }
     }
@@ -124,24 +118,19 @@ class ChatViewModel(
         _activeThreadId.value = null
     }
 
-    private fun sendMessageInternal(threadId: Long, messageContent: String) {
+    /**
+     * @param localThreadId is used to differentiate threads when showing notifications
+     * */
+    private fun sendMessageInternal(localThreadId: Long, messageContent: String) {
         viewModelScope.launch {
             try {
-                // `sendUserMessage` now takes `threadId`
-                val response = chatRepository.sendUserMessage(threadId, messageContent)
-                if (response.status.isSuccess()) {
-                    // `storeAiMessage` now takes `threadId`
-                    chatRepository.storeAiMessage(threadId, response.bodyAsText())
-                    _chatSubtitle.value = getRandomMessagePrompt()
-                } else {
-                    _errorMessage.value = "Failed to send: ${response.status.value} - ${response.bodyAsText()}"
-                    Log.e(TAG, "sendMessageInternal: API error: ${response.status.value} - ${response.bodyAsText()}")
-                    _chatSubtitle.value = "An error occurred"
-                }
+                chatRepository.sendUserMessage(localThreadId, _activeAiThreadId.value, messageContent)
+                _chatSubtitle.value = getRandomMessagePrompt()
+                // repository updates are automatically reflected on UI using _messages
             } catch (e: Exception) {
                 _errorMessage.value = "Error sending: ${e.localizedMessage}"
                 Log.e(TAG, "sendMessageInternal: Exception: ${e.localizedMessage}", e)
-                _chatSubtitle.value = "An error occurred"
+                _chatSubtitle.value = "Something went wrong"
             }
         }
     }

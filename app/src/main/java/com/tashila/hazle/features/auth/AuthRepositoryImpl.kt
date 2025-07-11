@@ -12,12 +12,9 @@ import java.util.Date
 
 class AuthRepositoryImpl(
     private val authApiService: AuthApiService,
-    private val tokenRepository: TokenRepository
+    private val tokenRepository: TokenRepository,
+    private val jsonDecoder: Json
 ) : AuthRepository {
-    private val jsonDecoder = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
 
     override suspend fun signIn(request: SupabaseSignInRequest): Result<SupabaseAuthResponse> {
         return try {

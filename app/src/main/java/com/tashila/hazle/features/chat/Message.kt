@@ -10,6 +10,7 @@ data class Message(
     val id: Long = System.now().toEpochMilliseconds(),
     val text: String,
     val isFromMe: Boolean,
+    val aiThreadId: String? = null,
     @Serializable(with = InstantStringSerializer::class)
     val timestamp: Instant = System.now()
 )

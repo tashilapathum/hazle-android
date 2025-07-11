@@ -16,10 +16,10 @@ class NotificationReplyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTION_REPLY) {
             val replyText = getMessageText(intent)
-            val threadId = intent.getLongExtra(EXTRA_THREAD_ID, -1L)
+            val localThreadId = intent.getLongExtra(EXTRA_THREAD_ID, -1L)
 
             if (replyText != null && replyText.isNotBlank()) {
-                ForegroundApiService.startService(context, threadId, replyText.toString())
+                ForegroundApiService.startService(context, localThreadId, replyText.toString())
             }
         }
     }

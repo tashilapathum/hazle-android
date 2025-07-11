@@ -24,12 +24,12 @@ class ThreadRepositoryImpl(
         return threadDao.getAllThreads()
     }
 
-    override suspend fun deleteThread(threadId: Long) {
-        threadDao.deleteThread(threadId)
+    override suspend fun deleteThread(localThreadId: Long) {
+        threadDao.deleteThread(localThreadId)
     }
 
-    override suspend fun getThreadById(threadId: Long): ThreadEntity? {
-        return threadDao.getThreadById(threadId)
+    override suspend fun getThreadById(localThreadId: Long): ThreadEntity? {
+        return threadDao.getThreadById(localThreadId)
     }
 
     override suspend fun updateThread(thread: ThreadEntity) {

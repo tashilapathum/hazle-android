@@ -57,10 +57,10 @@ fun MainNavHost(
                     chatViewModel.startNewChat()
                     navController.navigate(AppDestinations.chatDetailRoute(-1L))
                 },
-                onThreadSelected = { threadId ->
+                onThreadSelected = { localThreadId ->
                     // Set active thread in ViewModel and navigate with the specific ID
-                    chatViewModel.setActiveThread(threadId)
-                    navController.navigate(AppDestinations.chatDetailRoute(threadId))
+                    chatViewModel.setActiveThread(localThreadId)
+                    navController.navigate(AppDestinations.chatDetailRoute(localThreadId))
                 },
                 threadsViewModel = koinViewModel()
             )
@@ -69,10 +69,10 @@ fun MainNavHost(
             route = AppDestinations.CHAT_VIEW_ROUTE_WITH_ARGS, // Use the route with args
             arguments = AppDestinations.CHAT_DETAIL_ARGS // Define the arguments
         ) { backStackEntry ->
-            // Extract the threadId from the navigation arguments
-            val threadId = backStackEntry.arguments?.getLong("threadId")
+            // Extract the localThreadId from the navigation arguments
+            val localThreadId = backStackEntry.arguments?.getLong("localThreadId")
 
-            // ChatScreen will now receive the threadId directly from navigation
+            // ChatScreen will now receive the localThreadId directly from navigation
             ChatScreen(
                 onCloseChat = {
                     navController.navigate(AppDestinations.THREADS_ROUTE) {
@@ -80,7 +80,7 @@ fun MainNavHost(
                     }
                 },
                 viewModel = chatViewModel,
-                initialThreadId = threadId
+                initialThreadId = localThreadId
             )
         }
         composable(AppDestinations.SETTINGS_ROUTE) {

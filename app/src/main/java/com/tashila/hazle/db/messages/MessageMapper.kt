@@ -3,13 +3,14 @@ package com.tashila.hazle.db.messages
 import com.tashila.hazle.features.chat.Message
 
 // Convert Domain Message to Data Layer MessageEntity
-fun Message.toEntity(threadId: Long): MessageEntity {
+fun Message.toEntity(localThreadId: Long): MessageEntity {
     return MessageEntity(
         id = this.id,
-        threadId = threadId,
         text = this.text,
         isFromMe = this.isFromMe,
-        timestamp = this.timestamp
+        timestamp = this.timestamp,
+        aiThreadId = this.aiThreadId,
+        localThreadId = localThreadId,
     )
 }
 
@@ -20,5 +21,6 @@ fun MessageEntity.toDomain(): Message {
         text = this.text,
         isFromMe = this.isFromMe,
         timestamp = this.timestamp,
+        aiThreadId = this.aiThreadId
     )
 }

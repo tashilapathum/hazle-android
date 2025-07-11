@@ -38,12 +38,12 @@ class NotificationService : Service(), KoinComponent {
         const val EXTRA_MESSAGE_THREAD_ID = "message_thread_id"
 
         // Helper to start this service
-        fun startService(context: Context, title: String, message: String, threadId: Long) {
+        fun startService(context: Context, title: String, message: String, localThreadId: Long) {
             val intent = Intent(context, NotificationService::class.java).apply {
                 action = "SHOW_CHAT_NOTIFICATION" // Custom action for clarity
                 putExtra(EXTRA_NOTIFICATION_TITLE, title)
                 putExtra(EXTRA_NOTIFICATION_MESSAGE, message)
-                putExtra(EXTRA_MESSAGE_THREAD_ID, threadId)
+                putExtra(EXTRA_MESSAGE_THREAD_ID, localThreadId)
             }
             context.startService(intent)
         }
@@ -53,28 +53,28 @@ class NotificationService : Service(), KoinComponent {
         if (intent?.action == "SHOW_CHAT_NOTIFICATION") {
             val title = intent.getStringExtra(EXTRA_NOTIFICATION_TITLE) ?: "Notification"
             val message = intent.getStringExtra(EXTRA_NOTIFICATION_MESSAGE) ?: "No message"
-            val threadId = intent.getLongExtra(EXTRA_MESSAGE_THREAD_ID, -1L)
+            val localThreadId = intent.getLongExtra(EXTRA_MESSAGE_THREAD_ID, -1L)
 
             serviceScope.launch {
-                showNotification(title, threadId)
+                showNotification(title, localThreadId)
             }
         }
         stopSelf(startId) // Stop the service once the notification is shown
         return START_NOT_STICKY
     }
 
-    private suspend fun showNotification(title: String, threadId: Long) {
+    private suspend fun showNotification(title: String, localThreadId: Long) {
         // Create an Intent to open MainActivity when the notification is tapped
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(EXTRA_MESSAGE_THREAD_ID, threadId)
+            putExtra(EXTRA_MESSAGE_THREAD_ID, localThreadId)
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val allMessages = chatRepository.getChatMessages(threadId).first().map { it }
+        val allMessages = chatRepository.getChatMessages(localThreadId).first().map { it }
 
         // Create Person objects for the participants
         val user = Person.Builder()
@@ -90,7 +90,7 @@ class NotificationService : Service(), KoinComponent {
             .build()
 
         fun getPerson(message: Message): Person {
-            return if (message.isFromMe == true)
+            return if (message.isFromMe)
                 user
             else
                 assistant
@@ -123,13 +123,13 @@ class NotificationService : Service(), KoinComponent {
         // Create an Intent for the BroadcastReceiver
         val replyIntent = Intent(this, NotificationReplyReceiver::class.java).apply {
             action = NotificationReplyReceiver.ACTION_REPLY
-            putExtra(NotificationReplyReceiver.EXTRA_THREAD_ID, threadId)
+            putExtra(NotificationReplyReceiver.EXTRA_THREAD_ID, localThreadId)
         }
 
         // Create a PendingIntent for the reply action
         val replyPendingIntent = PendingIntent.getBroadcast(
             applicationContext, // Use applicationContext for BroadcastReceiver
-            threadId.toInt(), // Use a unique request code if you have multiple reply notifications
+            localThreadId.toInt(), // Use a unique request code if you have multiple reply notifications
             replyIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )
@@ -159,7 +159,7 @@ class NotificationService : Service(), KoinComponent {
             .build()
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(threadId.toInt(), notification)
+        notificationManager.notify(localThreadId.toInt(), notification)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

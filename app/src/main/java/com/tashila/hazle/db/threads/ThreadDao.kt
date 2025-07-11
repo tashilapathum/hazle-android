@@ -17,9 +17,9 @@ interface ThreadDao {
     @Query("SELECT * FROM threads ORDER BY isPinned DESC, createdAt DESC")
     fun getAllThreads(): Flow<List<ThreadEntity>>
 
-    @Query("SELECT * FROM threads WHERE id = :threadId")
-    suspend fun getThreadById(threadId: Long): ThreadEntity?
+    @Query("SELECT * FROM threads WHERE id = :localThreadId")
+    suspend fun getThreadById(localThreadId: Long): ThreadEntity?
 
-    @Query("DELETE FROM threads WHERE id = :threadId")
-    suspend fun deleteThread(threadId: Long)
+    @Query("DELETE FROM threads WHERE id = :localThreadId")
+    suspend fun deleteThread(localThreadId: Long)
 }

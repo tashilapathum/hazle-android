@@ -13,6 +13,7 @@ data class ThreadEntity(
     val name: String,
     val isPinned: Boolean,
     val createdAt: Instant = Clock.System.now(),
+    val aiThreadId: String? = null,
     val lastMessageText: String? = null,
     val lastMessageTime: Instant? = null
 )

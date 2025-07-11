@@ -49,27 +49,27 @@ open class ThreadsViewModel(
 
     /**
      * Selects an existing thread to make it active.
-     * @param threadId The ID of the thread to select.
+     * @param localThreadId The ID of the thread to select.
      */
-    fun selectThread(threadId: Long) {
-        _selectedThreadId.value = threadId
-        Log.d(TAG, "Selected thread with ID: $threadId")
+    fun selectThread(localThreadId: Long) {
+        _selectedThreadId.value = localThreadId
+        Log.d(TAG, "Selected thread with ID: $localThreadId")
     }
 
     /**
      * Deletes a specific thread and deselects it if it was the active one.
-     * @param threadId The ID of the thread to delete.
+     * @param localThreadId The ID of the thread to delete.
      */
-    fun deleteThread(threadId: Long) {
+    fun deleteThread(localThreadId: Long) {
         viewModelScope.launch {
             try {
-                threadRepository.deleteThread(threadId)
-                Log.d(TAG, "Deleted thread with ID: $threadId")
-                if (_selectedThreadId.value == threadId) {
+                threadRepository.deleteThread(localThreadId)
+                Log.d(TAG, "Deleted thread with ID: $localThreadId")
+                if (_selectedThreadId.value == localThreadId) {
                     _selectedThreadId.value = null // Deselect if the active thread was deleted
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error deleting thread with ID $threadId: ${e.localizedMessage}", e)
+                Log.e(TAG, "Error deleting thread with ID $localThreadId: ${e.localizedMessage}", e)
                 // Handle error
             }
         }
