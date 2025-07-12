@@ -92,9 +92,6 @@ dependencies {
 
     implementation(libs.kotlinx.datetime)
 
-    // Coil
-    implementation(libs.coil.compose)
-
     // Auth
     implementation(libs.auth0.jwtdecode)
 

@@ -1,5 +1,6 @@
 package com.tashila.hazle.ui.components.settings
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,43 +39,32 @@ fun AccountInfoSection(userInfo: UserInfo, onLogoutClicked: () -> Unit, isLoggin
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Profile Picture
-        /*if (!userInfo.profileImageUrl.isNullOrEmpty()) {
-            Image(
-                painter = rememberAsyncImagePainter(userInfo.profileImageUrl),
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-        } else {*/
         Surface(
             modifier = Modifier
                 .size(72.dp)
                 .clip(CircleShape),
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) // Increased alpha for visibility
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = Icons.Outlined.Person, // Default person icon
+                    imageVector = Icons.Outlined.Person,
                     contentDescription = "Default Profile Picture",
                     modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer // Stronger tint
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }
-        //}
 
         // Name and Email
-        Column(modifier = Modifier.weight(1f)) { // Take remaining space
+        Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = userInfo.username,
+                text = userInfo.email,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = userInfo.email,
+                text = "Logged in",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )

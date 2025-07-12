@@ -3,6 +3,7 @@ package com.tashila.hazle.features.auth
 import android.util.Log
 import com.auth0.android.jwt.JWT
 import com.tashila.hazle.api.AuthApiService
+import com.tashila.hazle.features.settings.SettingsRepository
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -13,6 +14,7 @@ import java.util.Date
 class AuthRepositoryImpl(
     private val authApiService: AuthApiService,
     private val tokenRepository: TokenRepository,
+    private val settingsRepository: SettingsRepository,
     private val jsonDecoder: Json
 ) : AuthRepository {
 
@@ -24,6 +26,7 @@ class AuthRepositoryImpl(
             if (response.status.isSuccess()) {
                 val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
                 tokenRepository.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
+                settingsRepository.saveUserInfo(parsedResponse)
                 Result.success(parsedResponse)
             } else {
                 try {
@@ -51,6 +54,7 @@ class AuthRepositoryImpl(
             if (response.status.isSuccess()) {
                 val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
                 tokenRepository.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
+                settingsRepository.saveUserInfo(parsedResponse)
                 Result.success(parsedResponse)
             } else { // If the response indicates an error (non-2xx status code)
                 try {
@@ -104,6 +108,7 @@ class AuthRepositoryImpl(
             if (response.status.isSuccess()) {
                 val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
                 tokenRepository.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
+                settingsRepository.saveUserInfo(parsedResponse)
                 true
             } else {
                 try {

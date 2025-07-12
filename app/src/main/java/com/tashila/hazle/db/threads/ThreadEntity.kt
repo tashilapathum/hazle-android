@@ -9,7 +9,7 @@ import kotlin.time.Instant
 @Entity(tableName = "threads")
 @OptIn(ExperimentalTime::class)
 data class ThreadEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: Long = System.currentTimeMillis(),
     val name: String,
     val isPinned: Boolean,
     val createdAt: Instant = Clock.System.now(),

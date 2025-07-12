@@ -40,8 +40,18 @@ val appModule = module {
 
     // --- Repository Providers ---
     single<TokenRepository> { TokenRepositoryImpl(androidApplication()) }
-    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
-    single<ChatRepository> { ChatRepositoryImpl(get(), get(), get(), get()) }
+    single<AuthRepository> { AuthRepositoryImpl(
+        authApiService = get(),
+        tokenRepository = get(),
+        settingsRepository = get(),
+        jsonDecoder = get()
+    ) }
+    single<ChatRepository> { ChatRepositoryImpl(
+        apiService = get(),
+        messageDao = get(),
+        threadDao = get(),
+        jsonDecoder = get()
+    ) }
     single<ThreadRepository> { ThreadRepositoryImpl(get()) }
     single<SettingsRepository> { SettingsRepositoryImpl(androidContext()) }
 

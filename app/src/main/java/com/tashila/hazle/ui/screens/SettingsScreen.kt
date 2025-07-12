@@ -55,7 +55,6 @@ fun SettingsScreen(
 
     // Collect states from the ViewModel
     val apiUrlInput by viewModel.apiUrlInput.collectAsState()
-    val savedApiUrl by viewModel.savedApiUrl.collectAsState()
     val userInfo by viewModel.userInfo.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val message by viewModel.message.collectAsState()

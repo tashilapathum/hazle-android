@@ -1,5 +1,6 @@
 package com.tashila.hazle.features.settings
 
+import com.tashila.hazle.features.auth.SupabaseAuthResponse
 import com.tashila.hazle.features.auth.UserInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -25,6 +26,11 @@ interface SettingsRepository {
      * @param url The API URL string to save.
      */
     suspend fun saveApiUrl(url: String)
+
+    /**
+     * Converts `SupabaseAuthResponse` into `UserInfo` and stores it.
+     * */
+    suspend fun saveUserInfo(supabaseAuthResponse: SupabaseAuthResponse)
 
     /**
      * Retrieves the current user information as a Flow.

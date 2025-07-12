@@ -23,10 +23,6 @@ class SettingsViewModel(
     private val _apiUrlInput = MutableStateFlow("")
     val apiUrlInput: StateFlow<String> = _apiUrlInput.asStateFlow()
 
-    // State for the currently saved API URL (might be different from input until saved)
-    private val _savedApiUrl = MutableStateFlow("")
-    val savedApiUrl: StateFlow<String> = _savedApiUrl.asStateFlow()
-
     // State for user information
     private val _userInfo = MutableStateFlow(UserInfo("", ""))
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()
@@ -42,16 +38,11 @@ class SettingsViewModel(
     init {
         // Collect API URL from repository when ViewModel is initialized
         viewModelScope.launch {
-            repository.getApiUrl().collect { url ->
-                _apiUrlInput.value = url // Update input field with saved value
-                _savedApiUrl.value = url // Keep track of the last saved URL
-            }
+            repository.getApiUrl().collect { _apiUrlInput.value = it }
         }
         // Collect user info from repository
         viewModelScope.launch {
-            repository.getUserInfo().collect { info ->
-                _userInfo.value = info
-            }
+            repository.getUserInfo().collect { _userInfo.value = it }
         }
     }
 
@@ -73,7 +64,6 @@ class SettingsViewModel(
             _message.value = null // Clear previous messages
             try {
                 repository.saveApiUrl(_apiUrlInput.value)
-                _savedApiUrl.value = _apiUrlInput.value // Update saved URL state
                 _message.value = "API URL saved"
             } catch (e: Exception) {
                 _message.value = "Failed to save API URL: ${e.localizedMessage}"

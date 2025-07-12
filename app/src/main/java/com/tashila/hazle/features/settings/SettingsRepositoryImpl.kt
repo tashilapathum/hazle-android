@@ -6,14 +6,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.tashila.hazle.utils.SERVER_URL
+import com.tashila.hazle.features.auth.SupabaseAuthResponse
 import com.tashila.hazle.features.auth.UserInfo
+import com.tashila.hazle.utils.SERVER_URL
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -26,17 +26,8 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
     // Preference key for storing the API URL
     private object PreferencesKeys {
         val API_URL = stringPreferencesKey("api_url")
+        val USER_INFO = stringPreferencesKey("user_info")
     }
-
-    // Simulate storage for user information (would come from auth service in real app)
-    private val _userInfo = MutableStateFlow(
-        UserInfo(
-            username = "AI Chat User",
-            email = "user@example.com",
-            profileImageUrl = "https://placehold.co/100x100/A020F0/ffffff?text=User" // Placeholder image
-        )
-    )
-
     /**
      * Retrieves the API URL from DataStore as a Flow.
      */
@@ -58,14 +49,41 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.API_URL] = url
         }
-        println("API URL saved to DataStore: $url") // For debugging
+    }
+
+    /**
+     * Saves user info to DataStore.
+     */
+    override suspend fun saveUserInfo(supabaseAuthResponse: SupabaseAuthResponse) {
+        val id = supabaseAuthResponse.user.id
+        val email = supabaseAuthResponse.user.email
+        val userInfo = UserInfo(
+            id = id,
+            email = email,
+        )
+        val userInfoJson = Json.encodeToString(userInfo)
+
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.USER_INFO] = userInfoJson
+        }
     }
 
     /**
      * Retrieves the user information from the simulated storage.
      */
-    override fun getUserInfo(): Flow<UserInfo> {
-        return _userInfo.asStateFlow()
+    override fun getUserInfo(): Flow<UserInfo> { // Changed return type to UserInfo? to handle null
+        val defaultId = "Hazle User"
+        val defaultEmail = "user@email.com"
+        return context.dataStore.data
+            .map { preferences ->
+                val userInfoJson = preferences[PreferencesKeys.USER_INFO]
+                userInfoJson?.let {
+                    Json.decodeFromString<UserInfo>(it)
+                } ?: UserInfo(
+                    id = defaultId,
+                    email = defaultEmail,
+                )
+            }
     }
 
     /**
