@@ -55,9 +55,13 @@ fun ChatScreen(
         }
     }
 
-    // Automatically scroll to the bottom when new messages arrive
     LaunchedEffect(messages.size) {
+        // Automatically scroll to the bottom when new messages arrive
         listState.animateScrollToItem(messages.size)
+
+        // Update the subtitle only after receiving a message from AI
+        if (messages.isNotEmpty() && messages.last().isFromMe.not())
+            viewModel.updateSubtitle()
     }
 
     LaunchedEffect(Unit) {

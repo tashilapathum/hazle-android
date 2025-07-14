@@ -63,6 +63,6 @@ val appModule = module {
     // --- View Models ---
     viewModel { AuthViewModel(get()) }
     viewModel { ThreadsViewModel(get()) }
-    viewModel { ChatViewModel(get(), get()) }
+    viewModel { ChatViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get()) }
 }

@@ -3,18 +3,36 @@ package com.tashila.hazle
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.tashila.hazle.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
-class MyApplication : Application() {
+class MyApplication : Application(), LifecycleObserver {
+
     override fun onCreate() {
         super.onCreate()
         startKoin {
             androidContext(this@MyApplication)
             modules(appModule)
         }
+        addLifeCycleObserver()
         createNotificationChannel()
+    }
+
+    private fun addLifeCycleObserver() {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                isAppInForeground = true
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                isAppInForeground = false
+            }
+        })
     }
 
     private fun createNotificationChannel() {
@@ -44,5 +62,10 @@ class MyApplication : Application() {
     companion object {
         const val CHAT_NOTIFICATIONS_CHANNEL_ID = "chat_notifications"
         const val FOREGROUND_NOTIFICATION_CHANNEL_ID = "foreground_api_channel"
+
+        private var isAppInForeground = false
+        fun isAppInForeground(): Boolean {
+            return isAppInForeground
+        }
     }
 }

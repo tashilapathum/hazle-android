@@ -4,12 +4,14 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.tashila.hazle.MyApplication
 import com.tashila.hazle.MyApplication.Companion.FOREGROUND_NOTIFICATION_CHANNEL_ID
 import com.tashila.hazle.R
 import com.tashila.hazle.features.chat.ChatRepository
+import com.tashila.hazle.utils.getRandomNotificationText
+import com.tashila.hazle.utils.getRandomNotificationTitle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+
 
 class ForegroundApiService : Service(), KoinComponent {
 
@@ -53,7 +56,6 @@ class ForegroundApiService : Service(), KoinComponent {
             stopServiceSignal.receiveAsFlow().collect {
                 // This block will be executed when Unit is sent to the channel
                 // We'll update the notification and then stop the service.
-                Log.i(TAG, "onStartCommand: STOPPING service via signal")
                 notificationManager.cancel(FOREGROUND_NOTIFICATION_ID)
                 stopSelf() // Stop the foreground service
             }
@@ -65,8 +67,8 @@ class ForegroundApiService : Service(), KoinComponent {
         val localThreadId = intent?.getLongExtra(EXTRA_THREAD_ID, -1L) ?: -1L
 
         val initialNotification = NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Processing Request")
-            .setContentText("Your message is being sent...")
+            .setContentTitle(getRandomNotificationTitle())
+            .setContentText(getRandomNotificationText())
             .setSmallIcon(R.drawable.ic_logo)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
@@ -76,38 +78,33 @@ class ForegroundApiService : Service(), KoinComponent {
 
         if (messageContent.isNullOrBlank().not()) {
             activeRequestCount++ // Increment before launching the coroutine
-            Log.i(TAG, "onStartCommand: LAUNCHED new request, activeRequestCount: $activeRequestCount")
-
             serviceScope.launch {
+                var title: String
+                var message: String
                 try {
-                    val message = chatRepository.sendUserMessage(
+                    title = messageContent
+                    message = chatRepository.sendUserMessage(
                         localThreadId = localThreadId,
                         message = messageContent
                     )
-                    val title = messageContent
+                } catch (e: Exception) {
+                    title = "Message Failed!"
+                    message = "Error: ${e.localizedMessage ?: "Unknown error"}"
+                } finally {
+                    activeRequestCount-- // Decrement when a request finishes
+                    if (activeRequestCount == 0) {
+                        // All tasks are done, signal the service to stop
+                        stopServiceSignal.trySend(Unit).isSuccess
+                    }
+                }
 
+                if (MyApplication.isAppInForeground().not())
                     NotificationService.startService(
                         applicationContext,
                         title, message, localThreadId
                     )
-                } catch (e: Exception) {
-                    NotificationService.startService(
-                        applicationContext,
-                        "Message Failed!",
-                        "Error: ${e.localizedMessage ?: "Unknown error"}",
-                        localThreadId
-                    )
-                } finally {
-                    activeRequestCount-- // Decrement when a request finishes
-                    Log.i(TAG, "onStartCommand: REQUEST COMPLETED, activeRequestCount: $activeRequestCount")
-                    if (activeRequestCount == 0) {
-                        // All tasks are done, signal the service to stop
-                        stopServiceSignal.trySend(Unit).isSuccess // Non-blocking send
-                    }
-                }
             }
         } else {
-            Log.i(TAG, "onStartCommand: No message content, activeRequestCount: $activeRequestCount")
             // If no message content provided, and no other active jobs, stop immediately
             if (activeRequestCount == 0) { // Check active count
                 stopServiceSignal.trySend(Unit).isSuccess
@@ -123,7 +120,6 @@ class ForegroundApiService : Service(), KoinComponent {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i(TAG, "onDestroy: Service destroyed")
         serviceJob.cancel() // Cancel coroutine scope to clean up resources
         stopServiceSignal.close() // Close the channel
         notificationManager.cancel(FOREGROUND_NOTIFICATION_ID) // Ensure notification is cleared

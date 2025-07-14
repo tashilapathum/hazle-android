@@ -156,6 +156,7 @@ class NotificationService : Service(), KoinComponent {
             .setContentIntent(pendingIntent) // Set the intent to launch when tapped
             .setAutoCancel(true) // Notification disappears when tapped
             .addAction(replyAction)
+            .setAllowSystemGeneratedContextualActions(false)
             .build()
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager

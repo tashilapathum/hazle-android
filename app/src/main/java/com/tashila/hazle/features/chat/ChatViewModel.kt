@@ -1,9 +1,12 @@
 package com.tashila.hazle.features.chat
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tashila.hazle.features.notifications.ForegroundApiService
 import com.tashila.hazle.features.thread.ThreadRepository
+import com.tashila.hazle.utils.getRandomMessagePrompt
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -19,13 +22,13 @@ import kotlinx.coroutines.launch
 
 class ChatViewModel(
     private val chatRepository: ChatRepository,
-    private val threadRepository: ThreadRepository
+    private val threadRepository: ThreadRepository,
+    private val application: Application
 ) : ViewModel() {
 
     // The active thread ID, managed by the ViewModel
     private val _activeThreadId = MutableStateFlow<Long?>(null)
     private val _activeAiThreadId = MutableStateFlow<String?>(null)
-    val activeThreadId: StateFlow<Long?> = _activeThreadId
 
     // Messages flow, now dependent on the activeThreadId
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -62,13 +65,8 @@ class ChatViewModel(
         _currentMessage.value = newMessage
     }
 
-    // Function to send the current message
     fun sendMessage() {
         _chatSubtitle.value = "Sending..."
-        viewModelScope.launch {
-            delay((500..2000).random().toLong())
-            _chatSubtitle.value = "Thinking..." // delay because of the runs
-        }
         val messageText = _currentMessage.value.trim()
         if (messageText.isNotEmpty()) {
             viewModelScope.launch {
@@ -80,16 +78,23 @@ class ChatViewModel(
                     _activeThreadId.value = newThreadId
                     newThreadId
                 }
-
                 _currentMessage.value = "" // Clear the input field
 
-                Log.i(TAG, "sendMessage: Sending message to thread $currentThreadId")
-                sendMessageInternal(currentThreadId, messageText)
+                ForegroundApiService.Companion.startService(
+                    application,
+                    currentThreadId,
+                    messageText
+                )
             }
+        }
+
+        viewModelScope.launch {
+            delay((500..2000).random().toLong())
+            if (_chatSubtitle.value == "Sending...") // delay because of the runs
+                _chatSubtitle.value = "Thinking..."
         }
     }
 
-    // Function to start a new chat (which effectively means creating a new thread)
     fun startNewChat() {
         _activeThreadId.value = null // Clear active thread, a new one will be created on next message
         _activeAiThreadId.value = null
@@ -97,7 +102,6 @@ class ChatViewModel(
         _errorMessage.value = "" // Clear any errors
         _chatTitle.value = "New chat"
         _chatSubtitle.value = "What's up?"
-        Log.d(TAG, "Starting a new chat.")
     }
 
     fun setActiveThread(localThreadId: Long?) {
@@ -116,6 +120,10 @@ class ChatViewModel(
     fun closeChat() {
         viewModelScope.launch { _closeChat.emit(Unit) }
         _activeThreadId.value = null
+    }
+
+    fun updateSubtitle() {
+        _chatSubtitle.value = getRandomMessagePrompt()
     }
 
     /**
@@ -140,17 +148,6 @@ class ChatViewModel(
             text = "Hi, I'm Hazle, your AI assistant. I'll always try to give concise answers.",
             isFromMe = false
         )))
-    }
-
-    private fun getRandomMessagePrompt(): String {
-        val prompts = listOf(
-            "What's up?",
-            "Followup?",
-            "What's on your mind?",
-            "Got a thought to share?",
-            "Feeling chatty?"
-        )
-        return prompts.random()
     }
 
     companion object {

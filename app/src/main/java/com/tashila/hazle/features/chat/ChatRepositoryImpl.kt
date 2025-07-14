@@ -1,5 +1,6 @@
 package com.tashila.hazle.features.chat
 
+import android.util.Log
 import com.tashila.hazle.api.ApiService
 import com.tashila.hazle.db.messages.MessageDao
 import com.tashila.hazle.db.messages.toDomain
@@ -36,7 +37,15 @@ class ChatRepositoryImpl(
         updateThread(newMessage, localThreadId)
         val response = apiService.sendMessage(newMessage)
         val responseBody = response.bodyAsText()
-        val message = jsonDecoder.decodeFromString<Message>(responseBody)
+        val message = try {
+            jsonDecoder.decodeFromString<Message>(responseBody)
+        } catch (e: Exception) {
+            Log.e(TAG, "sendUserMessage: Failed to decode JSON", e)
+            Message(
+                text = "Something went wrong",
+                isFromMe = false
+            )
+        }
         storeAiMessage(localThreadId, message)
         return message.text
     }
