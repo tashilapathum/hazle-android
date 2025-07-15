@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.sentry)
 }
 
 android {
@@ -99,4 +100,10 @@ dependencies {
     // Room
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
+}
+
+sentry {
+    org.set("tashila-pathum")
+    projectName.set("android")
+    includeSourceContext.set(true)
 }

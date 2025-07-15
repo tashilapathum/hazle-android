@@ -8,8 +8,11 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.tashila.hazle.di.appModule
+import io.sentry.android.core.SentryAndroid
+import io.sentry.android.core.SentryAndroidOptions
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+
 
 class MyApplication : Application(), LifecycleObserver {
 
@@ -21,6 +24,7 @@ class MyApplication : Application(), LifecycleObserver {
         }
         addLifeCycleObserver()
         createNotificationChannel()
+        initializeSentry()
     }
 
     private fun addLifeCycleObserver() {
@@ -57,6 +61,23 @@ class MyApplication : Application(), LifecycleObserver {
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(chatChannel)
         manager.createNotificationChannel(serviceChannel)
+    }
+
+    private fun initializeSentry() {
+        SentryAndroid.init(this) { options: SentryAndroidOptions ->
+            options.dsn = "https://d5f49007f580761e93cb6132149c7aeb@o4509654455418880.ingest.de.sentry.io/4509654457253968"
+            options.isEnableUserInteractionBreadcrumbs = true
+            options.isEnableUserInteractionTracing = true
+
+            // Disable screenshot attachment on crash
+            options.isEnableScreenTracking = false
+
+            // Set performance tracing sample rate
+            options.tracesSampleRate = 0.25
+
+            // Set env
+            options.environment = if (BuildConfig.DEBUG) "development" else "production";
+        }
     }
 
     companion object {

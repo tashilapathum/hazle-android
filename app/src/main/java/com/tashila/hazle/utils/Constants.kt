@@ -3,7 +3,7 @@ package com.tashila.hazle.utils
 import com.tashila.hazle.BuildConfig
 
 val SERVER_URL = if (BuildConfig.DEBUG)
-    "http://192.168.100.80:8080/"
+    "https://hazle-backend-dev.onrender.com/"
 else
     "https://api.hazle.tashila.me/"
 
