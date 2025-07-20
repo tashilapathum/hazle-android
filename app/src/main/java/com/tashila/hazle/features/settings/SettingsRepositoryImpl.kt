@@ -3,6 +3,7 @@ package com.tashila.hazle.features.settings
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -27,28 +28,7 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
     private object PreferencesKeys {
         val API_URL = stringPreferencesKey("api_url")
         val USER_INFO = stringPreferencesKey("user_info")
-    }
-    /**
-     * Retrieves the API URL from DataStore as a Flow.
-     */
-    override fun getApiUrl(): Flow<String> {
-        return context.dataStore.data
-            .map { preferences ->
-                preferences[PreferencesKeys.API_URL] ?: SERVER_URL
-            }
-    }
-
-    override fun getBaseUrl(): String {
-        return runBlocking { getApiUrl().first() }
-    }
-
-    /**
-     * Saves the API URL to DataStore.
-     */
-    override suspend fun saveApiUrl(url: String) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.API_URL] = url
-        }
+        val ONBOARD_DONE = booleanPreferencesKey("onboard_done")
     }
 
     /**
@@ -84,6 +64,44 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
                     email = defaultEmail,
                 )
             }
+    }
+
+    /**
+     * Saves the API URL to DataStore.
+     */
+    override suspend fun saveApiUrl(url: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.API_URL] = url
+        }
+    }
+
+    /**
+     * Retrieves the API URL from DataStore as a Flow.
+     */
+    override fun getApiUrl(): Flow<String> {
+        return context.dataStore.data
+            .map { preferences ->
+                preferences[PreferencesKeys.API_URL] ?: SERVER_URL
+            }
+    }
+
+    override fun getBaseUrl(): String {
+        return runBlocking { getApiUrl().first() }
+    }
+
+    override suspend fun saveOnboardState(isDone: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.ONBOARD_DONE] = isDone
+        }
+    }
+
+    override fun isOnboarded(): Boolean {
+        return runBlocking {
+            context.dataStore.data
+                .map { preferences ->
+                    preferences[PreferencesKeys.ONBOARD_DONE] ?: false
+                }.first()
+        }
     }
 
     /**

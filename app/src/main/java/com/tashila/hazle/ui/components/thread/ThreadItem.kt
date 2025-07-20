@@ -41,8 +41,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.tashila.hazle.db.threads.ThreadEntity
+import com.tashila.hazle.utils.ColorGenerator
 import com.tashila.hazle.utils.toTimeString
-import kotlin.random.Random
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -58,15 +58,7 @@ fun ThreadItem(
     val interactionSource = remember { MutableInteractionSource() }
     var showContextMenu by remember { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
-
-    // Define a range of base icons for variety
-    val baseIcons = remember { getIconsList() }
-    // Determine the icon and its circle color based on thread ID for consistency
-    val randomGenerator = remember(thread.id) { Random(thread.id) }
-    val randomColor = Color(randomGenerator.nextFloat(), randomGenerator.nextFloat(), randomGenerator.nextFloat())
-    val avatarIcon = remember(thread.id) { baseIcons[randomGenerator.nextInt(baseIcons.size)] }
-    val avatarCircleColor = remember(thread.id) { randomColor.copy(alpha = 0.1f) }
-    val avatarIconTint = remember(avatarCircleColor) { randomColor.copy(alpha = 0.7f) }
+    val generator = remember(thread.id) { ColorGenerator(thread.id) }
 
     val textColor = if (isSelected)
         MaterialTheme.colorScheme.onPrimaryContainer
@@ -99,14 +91,14 @@ fun ThreadItem(
                 modifier = Modifier
                     .size(48.dp) // Slightly larger circle for the icon
                     .clip(CircleShape) // Clip to a circle
-                    .background(avatarCircleColor) // Random background color for the circle
+                    .background(generator.circleColor) // Random background color for the circle
                     .padding(8.dp), // Padding for the icon inside the circle
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = avatarIcon, // Use the randomly selected base icon
+                    imageVector = generator.icon, // Use the randomly selected base icon
                     contentDescription = "Avatar",
-                    tint = avatarIconTint, // Tint the icon
+                    tint = generator.iconTint, // Tint the icon
                     modifier = Modifier.size(32.dp) // Smaller icon inside the circle
                 )
             }

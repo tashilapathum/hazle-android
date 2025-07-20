@@ -6,6 +6,7 @@ import androidx.navigation.navArgument
 object AppDestinations {
     const val THREADS_ROUTE = "threads_list"
     const val SETTINGS_ROUTE = "app_settings"
+    const val ONBOARDING_ROUTE = "app_onboarding"
     const val CHAT_VIEW_BASE_ROUTE = "chat_view"
     // The argument name must match the one used in navArgument()
     const val CHAT_VIEW_ROUTE_WITH_ARGS = "$CHAT_VIEW_BASE_ROUTE/{localThreadId}"

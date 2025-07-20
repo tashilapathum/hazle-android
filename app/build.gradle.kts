@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.koin.androidx.compose)
 
     implementation(libs.kotlinx.datetime)
+    implementation(libs.coil.compose)
 
     // Auth
     implementation(libs.auth0.jwtdecode)

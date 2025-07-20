@@ -2,6 +2,7 @@ package com.tashila.hazle.ui.activities
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -9,12 +10,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,11 +30,13 @@ import androidx.navigation.compose.rememberNavController
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.chat.ChatViewModel
 import com.tashila.hazle.features.notifications.NotificationService.Companion.EXTRA_MESSAGE_THREAD_ID
+import com.tashila.hazle.features.settings.SettingsRepository
 import com.tashila.hazle.ui.components.AuroraBackground
 import com.tashila.hazle.ui.components.PermissionRequester
 import com.tashila.hazle.ui.navigation.AppDestinations
 import com.tashila.hazle.ui.navigation.MainNavHost
 import com.tashila.hazle.ui.theme.HazleTheme
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -39,18 +48,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             HazleTheme {
-                val context = LocalContext.current
                 val authRepository: AuthRepository = koinInject()
-                val navController = rememberNavController() // Create NavController here
-                val chatViewModel: ChatViewModel = koinViewModel() // Get shared ChatViewModel
+                val settingsRepository: SettingsRepository = koinInject()
+                val chatViewModel: ChatViewModel = koinViewModel()
 
-                LaunchedEffect(Unit) {
-                    if (authRepository.isAuthenticated().not()) {
-                        val intent = Intent(context, LoginActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        context.startActivity(intent)
-                        (context as? Activity)?.finish()
-                        return@LaunchedEffect
+                val context = LocalContext.current
+                val navController = rememberNavController()
+                val coroutineScope = rememberCoroutineScope()
+                var promptLogin by remember { mutableStateOf(false) }
+
+                if (settingsRepository.isOnboarded()) {
+                    LaunchedEffect(Unit) {
+                        if (authRepository.isAuthenticated().not()) {
+                            promptLogin = true
+                            return@LaunchedEffect
+                        }
                     }
                 }
 
@@ -62,10 +74,15 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = Color.Transparent
                     ) {
-                        // Your existing NavHost and notification logic
                         MainNavHost(
                             navController = navController,
-                            chatViewModel = chatViewModel
+                            chatViewModel = chatViewModel,
+                            onboardingFinished = {
+                                coroutineScope.launch {
+                                    settingsRepository.saveOnboardState(isDone = true)
+                                    showLogin(context)
+                                }
+                            }
                         )
 
                         // When coming from notification
@@ -84,9 +101,14 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        RequestNotificationPermission()
+
+                        if (settingsRepository.isOnboarded())
+                            RequestNotificationPermission()
+                        else
+                            navController.navigate(AppDestinations.ONBOARDING_ROUTE)
                     }
                 }
+                if (promptLogin) PromptLogin(context)
             }
         }
     }
@@ -96,6 +118,32 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable
+private fun PromptLogin(context: Context) {
+    AlertDialog(
+        onDismissRequest = {},
+        title = {
+            Text(text = "Session Timed Out")
+        },
+        text = {
+            Text(text = "Your session has expired. Please log in again.")
+        },
+        confirmButton = {
+            TextButton (
+                onClick = { showLogin(context) }
+            ) {
+                Text("OK")
+            }
+        }
+    )
+}
+
+private fun showLogin(context: Context) {
+    val intent = Intent(context, LoginActivity::class.java)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    context.startActivity(intent)
+    (context as? Activity)?.finish()
+}
 
 @Composable
 fun RequestNotificationPermission() {

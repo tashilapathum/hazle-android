@@ -4,12 +4,14 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tashila.hazle.features.chat.ChatViewModel
 import com.tashila.hazle.ui.screens.ChatScreen
+import com.tashila.hazle.ui.screens.OnboardingScreen
 import com.tashila.hazle.ui.screens.SettingsScreen
 import com.tashila.hazle.ui.screens.ThreadsScreen
 import org.koin.androidx.compose.koinViewModel
@@ -17,7 +19,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MainNavHost(
     navController: NavHostController,
-    chatViewModel: ChatViewModel
+    chatViewModel: ChatViewModel,
+    onboardingFinished: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -88,6 +91,16 @@ fun MainNavHost(
                 onBackClicked = {
                     navController.popBackStack()
                 }
+            )
+        }
+        composable(AppDestinations.ONBOARDING_ROUTE) {
+            OnboardingScreen(
+                pagerState = rememberPagerState(
+                    0,
+                    initialPageOffsetFraction = 0F,
+                    pageCount = { 4 }
+                ),
+                onboardingFinished = { onboardingFinished.invoke() }
             )
         }
     }
