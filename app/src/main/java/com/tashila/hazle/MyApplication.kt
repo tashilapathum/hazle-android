@@ -45,17 +45,17 @@ class MyApplication : Application(), LifecycleObserver {
             "Chat Responses",
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Notifications for chat responses and API call results."
+            description = "Notifications for chat responses."
             enableLights(true)
             enableVibration(true)
         }
 
         val serviceChannel = NotificationChannel(
             FOREGROUND_NOTIFICATION_CHANNEL_ID,
-            "Background API Operations",
+            "Background Operations",
             NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "Notifications for ongoing background API calls."
+            description = "Notifications when processing requests in the background."
         }
 
         val manager = getSystemService(NotificationManager::class.java)

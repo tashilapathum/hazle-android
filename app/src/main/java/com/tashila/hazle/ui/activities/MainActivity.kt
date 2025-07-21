@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.chat.ChatViewModel
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
             HazleTheme {
@@ -55,14 +57,28 @@ class MainActivity : ComponentActivity() {
                 val context = LocalContext.current
                 val navController = rememberNavController()
                 val coroutineScope = rememberCoroutineScope()
-                var promptLogin by remember { mutableStateOf(false) }
+                var showSessionTimeOut by remember { mutableStateOf(false) }
+                var askNotificationPermission by remember { mutableStateOf(false) }
 
-                if (settingsRepository.isOnboarded()) {
-                    LaunchedEffect(Unit) {
-                        if (authRepository.isAuthenticated().not()) {
-                            promptLogin = true
-                            return@LaunchedEffect
+                // Determine initial navigation based on onboarding and authentication state
+                LaunchedEffect(Unit) {
+                    val isOnboarded = settingsRepository.isOnboarded()
+                    val isAuthenticated = authRepository.isAuthenticated()
+
+                    if (!isOnboarded) {
+                        // User is not onboarded, show onboarding
+                        // MainNavHost will handle showing the onboarding route
+                    } else if (!isAuthenticated) {
+                        // User is onboarded but not logged in, prompt login
+                        showSessionTimeOut = true
+                    } else {
+                        // User is onboarded and logged in, navigate to threads and ask for permission
+                        navController.navigate(AppDestinations.THREADS_ROUTE) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true // Clear back stack up to start destination
+                            }
                         }
+                        askNotificationPermission = true
                     }
                 }
 
@@ -80,7 +96,17 @@ class MainActivity : ComponentActivity() {
                             onboardingFinished = {
                                 coroutineScope.launch {
                                     settingsRepository.saveOnboardState(isDone = true)
-                                    showLogin(context)
+                                    // After onboarding, if authenticated, navigate to threads and ask for permission
+                                    if (authRepository.isAuthenticated()) {
+                                        navController.navigate(AppDestinations.THREADS_ROUTE) {
+                                            popUpTo(navController.graph.startDestinationId) {
+                                                inclusive = true
+                                            }
+                                        }
+                                        askNotificationPermission = true
+                                    } else {
+                                        showLogin(context)
+                                    }
                                 }
                             }
                         )
@@ -102,13 +128,10 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        if (settingsRepository.isOnboarded())
-                            RequestNotificationPermission()
-                        else
-                            navController.navigate(AppDestinations.ONBOARDING_ROUTE)
+                        if (askNotificationPermission) RequestNotificationPermission()
                     }
                 }
-                if (promptLogin) PromptLogin(context)
+                if (showSessionTimeOut) PromptLogin(context)
             }
         }
     }

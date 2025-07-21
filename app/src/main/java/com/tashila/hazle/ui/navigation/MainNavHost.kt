@@ -24,7 +24,7 @@ fun MainNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = AppDestinations.THREADS_ROUTE,
+        startDestination = AppDestinations.ONBOARDING_ROUTE,
         enterTransition = {
             slideIntoContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Start,
