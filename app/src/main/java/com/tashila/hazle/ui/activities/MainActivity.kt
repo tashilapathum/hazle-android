@@ -4,13 +4,16 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -170,18 +173,65 @@ private fun showLogin(context: Context) {
 
 @Composable
 fun RequestNotificationPermission() {
+    val context = LocalContext.current
+    var showPermissionRationale by remember { mutableStateOf(false) }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         PermissionRequester(
             permission = Manifest.permission.POST_NOTIFICATIONS,
-            onPermissionGranted = {
-                println("Notification permission granted!")
-            },
-            onPermissionDenied = {
-                println("Notification permission denied.")
-            },
+            onPermissionGranted = { showPermissionRationale = false },
+            onPermissionDenied = { showPermissionRationale = true },
             onPermissionPermanentlyDenied = {
-                println("Notification permission permanently denied. Direct user to settings.")
+                showPermissionRationale = false
+                showNotificationSettings(context)
             }
         )
     }
+
+    if (showPermissionRationale) {
+        NotificationPermissionRationaleDialog(
+            onDismiss = { showPermissionRationale = false },
+            onGrant = {
+                showPermissionRationale = false
+                showNotificationSettings(context)
+            }
+        )
+    }
+
+}
+
+@Composable
+fun NotificationPermissionRationaleDialog(
+    onDismiss: () -> Unit,
+    onGrant: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Notification Permission Required") },
+        text = {
+            Text(
+                "Hazle needs notification permission to show you new messages, and to work in the background."
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onGrant
+            ) {
+                Text("Grant Permission")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text("No Thanks")
+            }
+        },
+    )
+}
+
+private fun showNotificationSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.fromParts("package", context.packageName, null)
+    }
+    context.startActivity(intent)
 }

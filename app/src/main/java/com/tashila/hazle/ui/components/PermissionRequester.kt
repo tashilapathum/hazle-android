@@ -56,10 +56,7 @@ fun PermissionRequester(
             }
             // 2. Check if we should show a rationale (user previously denied but didn't permanently deny)
             shouldShowRequestPermissionRationale(context, permission) -> {
-                // In a real app, you might show an AlertDialog here to explain why the permission is needed.
-                // After the user dismisses the rationale dialog, then you'd call requestPermissionLauncher.launch(permission).
-                // For simplicity in this example, we directly launch the request.
-                requestPermissionLauncher.launch(permission)
+                onPermissionDenied()
             }
             // 3. Otherwise, request the permission directly
             else -> {
