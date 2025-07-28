@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 /**
  * ViewModel for the Settings screen.
@@ -31,9 +32,13 @@ class SettingsViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // State for showing user messages (e.g., "Saved successfully!")
+    // State for showing user messages
     private val _message = MutableStateFlow<String?>(null)
     val message: StateFlow<String?> = _message.asStateFlow()
+
+    // State locale tag
+    private val _selectedLocale = MutableStateFlow(Locale.getDefault().language)
+    val selectedLocale: StateFlow<String> = _selectedLocale.asStateFlow()
 
     init {
         // Collect API URL from repository when ViewModel is initialized
@@ -43,6 +48,10 @@ class SettingsViewModel(
         // Collect user info from repository
         viewModelScope.launch {
             repository.getUserInfo().collect { _userInfo.value = it }
+        }
+        // Collect Locale
+        viewModelScope.launch {
+            repository.getLocale().collect { _selectedLocale.value = it }
         }
     }
 
@@ -69,6 +78,22 @@ class SettingsViewModel(
                 _message.value = "Failed to save API URL: ${e.localizedMessage}"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Handles the save language action.
+     */
+    fun onLanguageClicked(locale: String) {
+        _selectedLocale.value = locale
+        viewModelScope.launch {
+            _message.value = null // Clear previous messages
+            try {
+                repository.saveLocale(_selectedLocale.value)
+                _message.value = "Language changed. Restart the app to apply changes."
+            } catch (e: Exception) {
+                _message.value = "Failed to change languageL: ${e.localizedMessage}"
             }
         }
     }

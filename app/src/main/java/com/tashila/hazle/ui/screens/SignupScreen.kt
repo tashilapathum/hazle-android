@@ -19,8 +19,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tashila.hazle.R
 import com.tashila.hazle.ui.components.auth.EmailInputField
 import com.tashila.hazle.ui.components.auth.LogoText
 import com.tashila.hazle.ui.components.auth.PasswordInputField
@@ -55,13 +57,13 @@ fun SignupScreen(
 
             // Signup Text / Welcome Message
             Text(
-                text = "Join Hazle Today!",
+                text = stringResource(id = R.string.join_hazle_title),
                 style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "Create your account",
+                text = stringResource(id = R.string.create_account_message),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 32.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
@@ -109,9 +111,14 @@ fun SignupScreen(
                 shape = MaterialTheme.shapes.medium
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp)
+                    )
                 } else {
-                    Text("Sign Up", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = stringResource(id = R.string.sign_up),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -119,7 +126,7 @@ fun SignupScreen(
             // Login Button
             TextButton(onClick = onLoginClick) {
                 Text(
-                    "Already have an account? Login",
+                    stringResource(id = R.string.already_have_account),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge
                 )

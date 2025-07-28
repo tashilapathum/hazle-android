@@ -19,8 +19,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tashila.hazle.R
 import com.tashila.hazle.ui.components.auth.EmailInputField
 import com.tashila.hazle.ui.components.auth.LogoText
 import com.tashila.hazle.ui.components.auth.PasswordInputField
@@ -51,15 +53,15 @@ fun LoginScreen(
         ) {
             LogoText()
 
-            // Login Text / Welcome Message
+            // Welcome Message
             Text(
-                text = "Welcome Back!",
+                text = stringResource(id = R.string.welcome_back_title),
                 style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "Sign in to continue",
+                text = stringResource(id = R.string.sign_in_to_continue),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 32.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
@@ -98,9 +100,14 @@ fun LoginScreen(
                 shape = MaterialTheme.shapes.medium
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp),)
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp)
+                    )
                 } else {
-                    Text("Login", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = stringResource(id = R.string.login),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -108,7 +115,7 @@ fun LoginScreen(
             // Sign Up Button
             TextButton(onClick = onSignupClick) {
                 Text(
-                    "Don't have an account? Sign up",
+                    stringResource(id = R.string.dont_have_account),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge
                 )

@@ -30,9 +30,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tashila.hazle.R
 import com.tashila.hazle.features.thread.ThreadsViewModel
 import com.tashila.hazle.ui.components.thread.ThreadItem
 import com.tashila.hazle.ui.theme.WhisperFontFamily
@@ -95,20 +97,20 @@ fun ThreadsScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.Chat,
-                        contentDescription = "No chats",
+                        contentDescription = stringResource(id = R.string.no_chats_content_description),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         modifier = Modifier.size(72.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No chats yet.",
+                        text = stringResource(id = R.string.no_chats_title),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Tap the '+' button below to start a new conversation!",
+                        text = stringResource(id = R.string.no_chats_description),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                         textAlign = TextAlign.Center,

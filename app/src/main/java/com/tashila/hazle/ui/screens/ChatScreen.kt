@@ -24,7 +24,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tashila.hazle.R
 import com.tashila.hazle.features.chat.ChatViewModel
 import com.tashila.hazle.ui.components.chat.ChatInputBar
 import com.tashila.hazle.ui.components.chat.ChatMessageBubble
@@ -112,11 +114,11 @@ fun ChatScreen(
     if (showInfoDialog) {
         AlertDialog(
             onDismissRequest = { showInfoDialog = false },
-            title = { Text("About Hazle") },
-            text = { Text("Hazle can make mistakes. Information for reference only.") },
+            title = { Text(stringResource(id = R.string.about_hazle_title)) },
+            text = { Text(stringResource(id = R.string.about_hazle_text)) },
             confirmButton = {
                 TextButton (onClick = { showInfoDialog = false }) {
-                    Text("OK")
+                    Text(stringResource(id = R.string.ok))
                 }
             }
         )

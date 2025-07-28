@@ -1,5 +1,83 @@
 <resources>
-    <string name="app_name">Hazle</string>
-    <string name="title_activity_text_receiver">TextReceiverActivity</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="app_name" translatable="false">Hazle</string>
+
+    <!-- Chats -->
+
+    <string name="no_chats_title">No chats yet.</string>
+    <string name="no_chats_description">Tap \'+\' to start a new conversation!</string>
+    <string name="no_chats_content_description">No chats</string>
+    <string name="about_hazle_title">About Hazle</string>
+    <string name="about_hazle_text">Hazle can make mistakes. Information for reference only.</string>
+    <string name="sent_to_hazle_notification">Sent to Hazle. You\'ll receive the reply via a notification.</string>
+    <string name="type_message_hint">Ask Hazle…</string>
+    <string name="rename_chat_title">Rename Chat</string>
+    <string name="enter_new_name_label">Enter new name</string>
+
+    <!-- Authentication -->
+
+    <string name="title_activity_login">Login</string>
+    <string name="session_timeout_title">Session Timed Out</string>
+    <string name="session_timeout_message">Your session has expired. Please log in again.</string>
+    <string name="notification_permission_title">Notification Permission Required</string>
+    <string name="notification_permission_text">Hazle needs notification permission to show you new messages, and to work in the background.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="no_thanks">No Thanks</string>
+    <string name="welcome_back_title">Welcome Back!</string>
+    <string name="sign_in_to_continue">Sign in to continue</string>
+    <string name="login">Login</string>
+    <string name="dont_have_account">Don\'t have an account? Sign up</string>
+    <string name="login_success_message">Login Successful!</string>
+    <string name="signup_success_message">Signup Successful! Please login.</string>
+    <string name="join_hazle_title">Join Hazle Today!</string>
+    <string name="create_account_message">Create your account</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="already_have_account">Already have an account? Login</string>
+
+    <!-- Onboarding -->
+
+    <string name="onboarding_page1_title">Chat with AI anytime, anywhere</string>
+    <string name="onboarding_page1_text">Just select some text or the whole page and \"Hazle it\" to start a conversation.</string>
+    <string name="onboarding_page2_title">Select and share</string>
+    <string name="onboarding_page2_text">When app doesn\'t include Hazle in the context menu, share using the share sheet.</string>
+    <string name="onboarding_page3_title">No more waiting for responses</string>
+    <string name="onboarding_page3_text">Hazle will send you a notification when processed. Just reply to continue the conversation.</string>
+    <string name="onboarding_page4_title">Multi-task with ease!</string>
+    <string name="onboarding_page4_text">Keep up with multiple chats at the same time, in your notification panel.</string>
+
+    <!-- Settings -->
+
+    <string name="confirm_title">Confirm</string>
+    <string name="confirm_message">Are you sure?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="logged_in_status">Logged in</string>
+    <string name="log_out_button">Log out</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="ok">OK</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="back_button_description">Back</string>
+
+    <string name="account_section_title">Account</string>
+    <string name="general_settings_section_title">General</string>
+    <string name="language_setting_title">Language</string>
+    <string name="language_setting_description">Current: %s</string>
+    <string name="select_language_dialog_title">Select Language</string>
+    <string name="language_english">English</string>
+    <string name="language_german">German</string>
+    <string name="language_sinhala">Sinhala</string>
+
+    <string name="api_endpoint_title">API Endpoint</string>
+    <string name="api_endpoint_description">Set the API Endpoint if you\'re self-hosting. Default is https://api.hazle.tashila.me/</string>
+    <string name="openai_api_key_title">OpenAI API Key</string>
+    <string name="openai_api_key_description">Set your OpenAI API Key for custom model usage.</string>
+    <string name="openai_api_key_dialog_title">Set OpenAI API Key</string>
+    <string name="openai_api_key_input_label">Enter API Key</string>
+    <string name="notification_settings_title">Notification Settings</string>
+    <string name="notification_settings_description">Manage app notifications</string>
+    <string name="about_title">About</string>
+    <string name="about_description_version">Version %s</string>
+
+    <string name="advanced_settings_section_title">Advanced</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.tashila.hazle.ui.components.settings
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,8 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tashila.hazle.R
 import com.tashila.hazle.features.auth.UserInfo
 
 /**
@@ -64,7 +65,7 @@ fun AccountInfoSection(userInfo: UserInfo, onLogoutClicked: () -> Unit, isLoggin
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Logged in",
+                text = stringResource(R.string.logged_in_status),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
@@ -76,7 +77,7 @@ fun AccountInfoSection(userInfo: UserInfo, onLogoutClicked: () -> Unit, isLoggin
                 onClick = onLogoutClicked,
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
             ) {
-                Text("Log Out")
+                Text(stringResource(R.string.log_out_button))
             }
         } else {
             CircularProgressIndicator(

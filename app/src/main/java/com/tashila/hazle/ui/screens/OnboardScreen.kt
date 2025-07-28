@@ -40,6 +40,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -93,7 +94,7 @@ fun OnboardingScreen(pagerState: PagerState, onboardingFinished: () -> Unit) {
         // Preload all images for the onboarding pages in the background
         pages.forEach { page ->
             val request = ImageRequest.Builder(context)
-                .data(page.content.image)
+                .data(page.content.imageUrl)
                 .build()
             ImageLoader(context).enqueue(request) // No need to await here, just start loading
         }
@@ -194,7 +195,7 @@ fun PortraitPageContent(content: PageContent) {
         Spacer(modifier = Modifier.height(60.dp))
 
         Text(
-            text = content.title,
+            text = stringResource(content.titleResId),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
@@ -205,10 +206,10 @@ fun PortraitPageContent(content: PageContent) {
 
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(content.image)
+                .data(content.imageUrl)
                 .crossfade(true)
                 .build(),
-            contentDescription = content.text,
+            contentDescription = stringResource(content.textResId),
             modifier = Modifier
                 .padding(horizontal = 24.dp)
                 .height(300.dp)
@@ -220,7 +221,7 @@ fun PortraitPageContent(content: PageContent) {
         Spacer(modifier = Modifier.height(40.dp))
 
         Text(
-            text = content.text,
+            text = stringResource(content.textResId),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -243,10 +244,10 @@ fun LandscapePageContent(content: PageContent) {
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(content.image)
+                .data(content.imageUrl)
                 .crossfade(true)
                 .build(),
-            contentDescription = content.text,
+            contentDescription = stringResource(content.textResId),
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 12.dp)
@@ -265,7 +266,7 @@ fun LandscapePageContent(content: PageContent) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = content.title,
+                text = stringResource(content.titleResId),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
@@ -274,7 +275,7 @@ fun LandscapePageContent(content: PageContent) {
             )
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = content.text,
+                text = stringResource(content.textResId),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

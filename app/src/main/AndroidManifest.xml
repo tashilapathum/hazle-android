@@ -18,7 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Hazle"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31">
+        android:localeConfig="@xml/locale_config"
+        tools:targetApi="33">
         <activity
             android:name=".ui.activities.LoginActivity"
             android:exported="false"
@@ -49,7 +50,7 @@
             android:name=".ui.activities.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Hazle">
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,6 +65,14 @@
         <service
             android:name=".features.notifications.NotificationService"
             android:exported="false" />
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
 
         <receiver
             android:name=".features.notifications.NotificationReplyReceiver"

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Chats -->
+
+    <string name="no_chats_title">කතාබස් නැත.</string>
+    <string name="no_chats_description">අලුත් කතාබහක් පටන් ගන්න \'+\' ඔබන්න!</string>
+    <string name="no_chats_content_description">කතාබස් නැත</string>
+    <string name="about_hazle_title">හේසල් ගැන</string>
+    <string name="about_hazle_text">හේසල් මගින් වැරදි තොරතුරු ලබාදිය හැකි ය. වැදගත් තොරතුරු තහවුරු කරගන්න.</string>
+    <string name="sent_to_hazle_notification">හේසල් වෙත යවන ලදී. පිළිතුරක් නොටිෆිකේෂන් මඟින් ඔබට ලැබෙනු ඇත.</string>
+    <string name="type_message_hint">හේසල්ගෙන් අසන්න…</string>
+    <string name="rename_chat_title">සංවාදයේ නම වෙනස් කරන්න</string>
+    <string name="enter_new_name_label">නව නමක් ඇතුළත් කරන්න</string>
+
+    <!-- Authentication -->
+
+    <string name="title_activity_login">ලොග් වෙන්න</string>
+    <string name="session_timeout_title">සෙෂන් එක කල් ඉකුත් විය</string>
+    <string name="session_timeout_message">ඔබගේ සෙෂන් එක කල් ඉකුත් වී ඇත. කරුණාකර නැවත පිවිසෙන්න.</string>
+    <string name="notification_permission_title">නොටිෆිකේෂන් අවසරය අවශ්‍යයි</string>
+    <string name="notification_permission_text">නව පණිවිඩ පෙන්වීමට සහ පසුබිමේ වැඩ කිරීමට නොටිෆිකේෂන් අවසරය අවශ්‍යයි.</string>
+    <string name="grant_permission">අවසරය දෙන්න</string>
+    <string name="no_thanks">අවලංගු කරන්න</string>
+    <string name="welcome_back_title">නැවත සාදරයෙන් පිළිගනිමු!</string>
+    <string name="sign_in_to_continue">ඉදිරියට යාමට පිවිසෙන්න</string>
+    <string name="login">ලොග් වෙන්න</string>
+    <string name="dont_have_account">ගිණුමක් නැද්ද? ලියාපදිංචි වන්න</string>
+    <string name="login_success_message">පිවිසීම සාර්ථකයි!</string>
+    <string name="signup_success_message">ලියාපදිංචිය සාර්ථකයි! කරුණාකර ලොග් වෙන්න.</string>
+    <string name="join_hazle_title">අදම හේසල් හා එක්වන්න!</string>
+    <string name="create_account_message">ඔබගේ ගිණුම සාදන්න</string>
+    <string name="sign_up">ලියාපදිංචි වන්න</string>
+    <string name="already_have_account">දැනටමත් ගිණුමක් තිබේද? ලොග් වෙන්න</string>
+
+    <!-- Onboarding -->
+
+    <string name="onboarding_page1_title">ඕනෑම වේලාවක, ඕනෑම තැනක AI සමඟ සංවාද කරන්න</string>
+    <string name="onboarding_page1_text">සංවාදයක් ආරම්භ කිරීමට යම් පෙළක් හෝ මුළු පිටුවම තෝරා "හේසල් කරන්න."</string>
+    <string name="onboarding_page2_title">තෝරාගෙන බෙදාගන්න</string>
+    <string name="onboarding_page2_text">ඇප් එකේ කොන්ටෙක්ස්ට් මෙනුවේ හේසල් නොමැති නම්, ෂෙයාර් ෂීට් එක භාවිතයෙන් බෙදාගන්න.</string>
+    <string name="onboarding_page3_title">පිළිතුරු සඳහා තවදුරටත් රැඳී සිටීමක් නැත</string>
+    <string name="onboarding_page3_text">ක්‍රියාවලිය අවසන් වූ පසු හේසල් ඔබට දැනුම්දීමක් එවනු ඇත. සංවාදය ඉදිරියට ගෙන යාමට පිළිතුරු දෙන්න.</string>
+    <string name="onboarding_page4_title">පහසුවෙන් බහු-කාර්යයන් කරන්න!</string>
+    <string name="onboarding_page4_text">ඔබගේ දැනුම්දීම් පැනලයේ එකවර සංවාද කිහිපයක් පවත්වා ගන්න.</string>
+
+    <!-- Settings -->
+
+    <string name="confirm_title">තහවුරු කරන්න</string>
+    <string name="confirm_message">ඔබට විශ්වාසද?</string>
+    <string name="yes">ඔව්</string>
+    <string name="no">නැත</string>
+    <string name="logged_in_status">පිවිස ඇත</string>
+    <string name="log_out_button">ඉවත් වන්න</string>
+    <string name="cancel">අවලංගු කරන්න</string>
+    <string name="save">සුරකින්න</string>
+    <string name="ok">හරි</string>
+
+    <string name="settings_title">සැකසීම්</string>
+    <string name="back_button_description">ආපසු</string>
+
+    <string name="account_section_title">ගිණුම</string>
+    <string name="general_settings_section_title">සාමාන්‍ය</string>
+    <string name="language_setting_title">භාෂාව</string>
+    <string name="language_setting_description">වත්මන්: %s</string>
+    <string name="select_language_dialog_title">භාෂාව තෝරන්න</string>
+    <string name="language_english">ඉංග්‍රීසි</string>
+    <string name="language_german">ජර්මන්</string>
+    <string name="language_sinhala">සිංහල</string>
+
+    <string name="api_endpoint_title">API Endpoint</string>
+    <string name="api_endpoint_description">Set the API Endpoint if you\'re self-hosting. Default is https://api.hazle.tashila.me/</string>
+    <string name="openai_api_key_title">OpenAI API Key</string>
+    <string name="openai_api_key_description">Set your OpenAI API Key for custom model usage.</string>
+    <string name="openai_api_key_dialog_title">Set OpenAI API Key</string>
+    <string name="openai_api_key_input_label">Enter API Key</string>
+    <string name="notification_settings_title">දැනුම්දීම් සැකසීම්</string>
+    <string name="notification_settings_description">ඇප් දැනුම්දීම් කළමනාකරණය කරන්න</string>
+    <string name="about_title">ගැන</string>
+    <string name="about_description_version">අනුවාදය %s</string>
+
+    <string name="advanced_settings_section_title">Advanced</string>
+
+</resources>

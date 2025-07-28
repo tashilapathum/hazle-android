@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.tashila.hazle.R
 import com.tashila.hazle.features.auth.AuthViewModel
 import com.tashila.hazle.ui.components.AuroraBackground
 import com.tashila.hazle.ui.screens.LoginScreen
@@ -45,7 +46,7 @@ class LoginActivity : ComponentActivity() {
                                     AuthViewModel.AuthEvent.LoginSuccess -> {
                                         Toast.makeText(
                                             this@LoginActivity,
-                                            "Login Successful!",
+                                            getString(R.string.login_success_message),
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         navController.navigate("home") { // Navigate to your main app screen
@@ -58,7 +59,7 @@ class LoginActivity : ComponentActivity() {
                                     AuthViewModel.AuthEvent.SignupSuccess -> {
                                         Toast.makeText(
                                             this@LoginActivity,
-                                            "Signup Successful! Please login.",
+                                            getString(R.string.signup_success_message),
                                             Toast.LENGTH_LONG
                                         ).show()
                                         navController.navigate("login") {

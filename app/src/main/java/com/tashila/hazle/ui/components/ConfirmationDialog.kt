@@ -4,13 +4,15 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.tashila.hazle.R
 
 @Composable
 fun ConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    title: String = "Confirm",
-    message: String = "Are you sure?"
+    title: String = stringResource(id = R.string.confirm_title),
+    message: String = stringResource(id = R.string.confirm_message)
 ) {
     AlertDialog(
         title = { Text(title) },
@@ -20,14 +22,14 @@ fun ConfirmationDialog(
                 onConfirm()
                 onDismiss()
             }) {
-                Text("Yes")
+                Text(stringResource(id = R.string.yes))
             }
         },
         dismissButton = {
             TextButton(onClick = {
                 onDismiss()
             }) {
-                Text("No")
+                Text(stringResource(id = R.string.no))
             }
         },
         onDismissRequest = onDismiss

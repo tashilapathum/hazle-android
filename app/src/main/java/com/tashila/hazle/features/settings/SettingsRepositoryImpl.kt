@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import java.util.Locale
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -29,6 +30,7 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
         val API_URL = stringPreferencesKey("api_url")
         val USER_INFO = stringPreferencesKey("user_info")
         val ONBOARD_DONE = booleanPreferencesKey("onboard_done")
+        val LOCALE_TAG = stringPreferencesKey("locale_tag")
     }
 
     /**
@@ -102,6 +104,30 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
                     preferences[PreferencesKeys.ONBOARD_DONE] ?: false
                 }.first()
         }
+    }
+
+    /**
+     * Saves the selected locale tag to DataStore.
+     */
+    override suspend fun saveLocale(localeTag: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LOCALE_TAG] = localeTag
+        }
+    }
+
+    /**
+     * Retrieves the locale tag from DataStore as a Flow.
+     */
+    override fun getLocale(): Flow<String> {
+        return context.dataStore.data
+            .map { preferences ->
+                // Default to the device's current language if no locale is saved
+                preferences[PreferencesKeys.LOCALE_TAG] ?: Locale.getDefault().language
+            }
+    }
+
+    override fun getLanguage(): String {
+        return runBlocking { getLocale().first() }
     }
 
     /**

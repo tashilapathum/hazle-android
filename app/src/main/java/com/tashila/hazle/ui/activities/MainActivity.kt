@@ -8,8 +8,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
@@ -29,8 +30,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
+import com.tashila.hazle.R
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.chat.ChatViewModel
 import com.tashila.hazle.features.notifications.NotificationService.Companion.EXTRA_MESSAGE_THREAD_ID
@@ -44,7 +48,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private var passedThreadId by mutableLongStateOf(-1L)
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +66,11 @@ class MainActivity : ComponentActivity() {
                 val coroutineScope = rememberCoroutineScope()
                 var showSessionTimeOut by remember { mutableStateOf(false) }
                 var askNotificationPermission by remember { mutableStateOf(false) }
+
+                // Set language
+                LaunchedEffect(Unit) {
+                    setAppLocale(settingsRepository.getLanguage())
+                }
 
                 // Determine initial navigation based on onboarding and authentication state
                 LaunchedEffect(Unit) {
@@ -144,21 +153,22 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+fun setAppLocale(localeTag: String) {
+    val localeList = LocaleListCompat.forLanguageTags(localeTag)
+    AppCompatDelegate.setApplicationLocales(localeList)
+}
+
 @Composable
 private fun PromptLogin(context: Context) {
     AlertDialog(
-        onDismissRequest = {},
-        title = {
-            Text(text = "Session Timed Out")
-        },
-        text = {
-            Text(text = "Your session has expired. Please log in again.")
-        },
+        onDismissRequest = { },
+        title = { Text(text = stringResource(R.string.session_timeout_title)) },
+        text = { Text(text = stringResource(R.string.session_timeout_message)) },
         confirmButton = {
             TextButton (
                 onClick = { showLogin(context) }
             ) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         }
     )
@@ -206,24 +216,16 @@ fun NotificationPermissionRationaleDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Notification Permission Required") },
-        text = {
-            Text(
-                "Hazle needs notification permission to show you new messages, and to work in the background."
-            )
-        },
+        title = { Text(stringResource(id = R.string.notification_permission_title)) },
+        text = { Text(stringResource(id = R.string.notification_permission_text)) },
         confirmButton = {
-            Button(
-                onClick = onGrant
-            ) {
-                Text("Grant Permission")
+            Button(onClick = onGrant) {
+                Text(stringResource(id = R.string.grant_permission))
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = onDismiss
-            ) {
-                Text("No Thanks")
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(id = R.string.no_thanks))
             }
         },
     )

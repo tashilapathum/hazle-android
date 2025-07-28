@@ -1,14 +1,12 @@
-package com.tashila.hazle.ui.components.thread
+package com.tashila.hazle.ui.components.settings
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,34 +15,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.tashila.hazle.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RenameThreadDialog(
-    currentName: String,
-    onDismiss: () -> Unit,
-    onRename: (String) -> Unit
+fun OpenAIApiKeyDialog(
+    initialApiKey: String,
+    onSave: (String) -> Unit,
+    onDismiss: () -> Unit
 ) {
-    var threadName by remember { mutableStateOf("") }
-    val isNameValid = remember { derivedStateOf { threadName.isNotBlank() } }
-    threadName = currentName
+    var apiKey by remember { mutableStateOf(initialApiKey) }
+    val isApiKeyValid = apiKey.isNotBlank()
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.rename_chat_title)) },
+        title = { Text(stringResource(id = R.string.openai_api_key_dialog_title)) },
         text = {
             OutlinedTextField(
-                value = threadName,
-                onValueChange = { threadName = it },
-                label = { Text(stringResource(id = R.string.enter_new_name_label)) },
+                value = apiKey,
+                onValueChange = { apiKey = it },
+                label = { Text(stringResource(id = R.string.openai_api_key_input_label)) },
                 singleLine = true,
-                isError = !isNameValid.value && threadName.isNotEmpty(),
+                isError = !isApiKeyValid && apiKey.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()
             )
         },
         confirmButton = {
             Button(
-                onClick = { onRename(threadName.trim()) },
-                enabled = isNameValid.value
+                onClick = { onSave(apiKey) },
+                enabled = isApiKeyValid
             ) {
                 Text(stringResource(id = R.string.save))
             }

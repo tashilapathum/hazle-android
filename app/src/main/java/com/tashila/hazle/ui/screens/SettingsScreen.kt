@@ -6,12 +6,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Key
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,12 +40,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tashila.hazle.R
 import com.tashila.hazle.features.settings.SettingsViewModel
 import com.tashila.hazle.ui.activities.LoginActivity
 import com.tashila.hazle.ui.components.ConfirmationDialog
 import com.tashila.hazle.ui.components.settings.AccountInfoSection
 import com.tashila.hazle.ui.components.settings.ApiUrlSettingDialog
+import com.tashila.hazle.ui.components.settings.OpenAIApiKeyDialog
+import com.tashila.hazle.ui.components.settings.SelectLanguageDialog
 import com.tashila.hazle.ui.components.settings.SettingsItem
 import org.koin.androidx.compose.koinViewModel
 
@@ -58,17 +66,19 @@ fun SettingsScreen(
     val userInfo by viewModel.userInfo.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val message by viewModel.message.collectAsState()
+    val language by viewModel.selectedLocale.collectAsState()
 
     // State for managing the visibility of dialogs
     var showApiUrlDialog by remember { mutableStateOf(false) }
     var showConfirmLogoutDialog by remember { mutableStateOf(false) }
+    var showOpenAIApiKeyDialog by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
 
     // Scroll behavior for the collapsible toolbar
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     // Snackbar host state for showing messages
     val snackbarHostState = remember { SnackbarHostState() }
-
 
     // Effect to show Snackbar messages
     LaunchedEffect(message) {
@@ -82,10 +92,13 @@ fun SettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), // Apply nested scroll
         topBar = {
             LargeTopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(id = R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClicked) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back_button_description)
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -105,6 +118,19 @@ fun SettingsScreen(
                 .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
+            // Account info
+            item {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Text(
+                        text = stringResource(id = R.string.account_section_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
             item {
                 AccountInfoSection(
                     userInfo = userInfo,
@@ -113,33 +139,87 @@ fun SettingsScreen(
                 )
             }
 
+            // General settings
+            item {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Text(
+                        text = stringResource(id = R.string.general_settings_section_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            // Language
             item {
                 SettingsItem(
-                    icon = Icons.Outlined.Link,
-                    title = "API Endpoint",
-                    description = "Set the API Endpoint if you're self-hosting. Default is https://api.hazle.tashila.me/",
-                    onClick = { showApiUrlDialog = true }
+                    icon = Icons.Outlined.Language,
+                    title = stringResource(id = R.string.language_setting_title),
+                    description = language,
+                    onClick = { showLanguageDialog = true }
                 )
             }
 
+            // Notifications
             item {
                 SettingsItem(
                     icon = Icons.Outlined.Notifications,
-                    title = "Notification Settings",
-                    description = "Manage app notifications",
+                    title = stringResource(id = R.string.notification_settings_title),
+                    description = stringResource(id = R.string.notification_settings_description),
                     onClick = { openAppNotificationSettings(context) }
                 )
             }
 
+            // About
             item {
                 SettingsItem(
                     icon = Icons.Outlined.Info,
-                    title = "About",
-                    description = "Version ${getAppVersion()}",
+                    title = stringResource(id = R.string.about_title),
+                    description = stringResource(id = R.string.about_description_version, getAppVersion()),
                     onClick = { /* TODO: Show app version, credits, etc. */ }
                 )
             }
+
+            item {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Text(
+                        text = stringResource(id = R.string.advanced_settings_section_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            item {
+                SettingsItem(
+                    icon = Icons.Outlined.Link,
+                    title = stringResource(id = R.string.api_endpoint_title),
+                    description = stringResource(id = R.string.api_endpoint_description),
+                    onClick = { showApiUrlDialog = true }
+                )
+            }
+            item {
+                SettingsItem(
+                    icon = Icons.Outlined.Key,
+                    title = stringResource(id = R.string.openai_api_key_title),
+                    description = stringResource(id = R.string.openai_api_key_description),
+                    onClick = { showOpenAIApiKeyDialog = true }
+                )
+            }
         }
+    }
+
+    if (showLanguageDialog) {
+        SelectLanguageDialog(
+            onDismiss = { showLanguageDialog = false },
+            onLanguageSelected = { localeTag ->
+                viewModel.onLanguageClicked(localeTag)
+                showLanguageDialog = false
+            }
+        )
     }
 
     if (showApiUrlDialog) {
@@ -162,6 +242,14 @@ fun SettingsScreen(
                 redirectToLogin(context)
             },
             onDismiss = { showConfirmLogoutDialog = false }
+        )
+    }
+
+    if (showOpenAIApiKeyDialog) {
+        OpenAIApiKeyDialog(
+            initialApiKey = "",
+            onDismiss = { showOpenAIApiKeyDialog = false },
+            onSave = {  } //TODO
         )
     }
 }
@@ -192,7 +280,7 @@ fun getAppVersion(): String {
             packageInfo.versionName
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
-            "1.0.0" // Fallback in case of error
+            "1.0.0"
         } as String
     }
 }

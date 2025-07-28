@@ -20,6 +20,9 @@ interface SettingsRepository {
     suspend fun saveOnboardState(isDone: Boolean)
     fun isOnboarded(): Boolean
 
-    suspend fun logout()
+    suspend fun saveLocale(localeTag: String)
+    fun getLocale(): Flow<String>
+    fun getLanguage(): String
 
+    suspend fun logout()
 }

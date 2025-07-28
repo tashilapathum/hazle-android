@@ -20,7 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tashila.hazle.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +44,7 @@ fun ChatInputBar(
                 value = text,
                 onValueChange = onTextChange,
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("Type a message...") },
+                placeholder = { Text(stringResource(id = R.string.type_message_hint)) },
                 keyboardActions = KeyboardActions(onSend = { onSendClick() }),
                 maxLines = 4, // Allow multi-line input up to a point
                 shape = RoundedCornerShape(24.dp)

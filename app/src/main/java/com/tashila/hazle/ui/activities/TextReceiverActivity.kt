@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.lifecycle.lifecycleScope
+import com.tashila.hazle.R
 import com.tashila.hazle.features.notifications.ForegroundApiService
 import com.tashila.hazle.features.thread.ThreadRepository
 import kotlinx.coroutines.launch
@@ -22,14 +23,16 @@ class TextReceiverActivity : ComponentActivity(), KoinComponent {
     }
 
     private fun processRequest() {
-        Toast.makeText(this, "Sent to Hazle. You'll receive the reply via a notification.", Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            this,
+            getString(R.string.sent_to_hazle_notification),
+            Toast.LENGTH_LONG
+        ).show()
         val messageContent: String? = when (intent.action) {
-            Intent.ACTION_PROCESS_TEXT -> {
-                // For "Process text" from text selection menu
+            Intent.ACTION_PROCESS_TEXT -> { // For "Process text" from text selection menu
                 intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
             }
-            Intent.ACTION_SEND -> {
-                // For "Share" from general share sheet
+            Intent.ACTION_SEND -> { // For "Share" from general share sheet
                 intent.getStringExtra(Intent.EXTRA_TEXT)
             }
             else -> null

@@ -31,6 +31,11 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -46,6 +51,11 @@ android {
         sourceSets.all {
             languageSettings.optIn("kotlin.time.ExperimentalTime")
         }
+    }
+    androidResources {
+        localeFilters.addAll(
+            listOf("en", "de", "si")
+        )
     }
 }
 
@@ -67,7 +77,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.compose.foundation)
-
+    implementation(libs.material)
 
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.datastore.preferences)

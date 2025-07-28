@@ -43,18 +43,18 @@ fun SettingsItem(
                 indication = ripple(),
                 interactionSource = interactionSource
             ),
-        color = Color.Transparent // No background for the item itself
+        color = Color.Transparent
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp) // Spacing between icon and text
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = null, // Content description can be added if needed
-                modifier = Modifier.size(24.dp), // Standard icon size
-                tint = MaterialTheme.colorScheme.onSurfaceVariant // Use a subtle tint for icons
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Column(modifier = Modifier.weight(1f)) { // Text takes remaining space
                 Text(
