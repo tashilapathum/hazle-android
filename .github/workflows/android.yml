@@ -1,10 +1,14 @@
-name: Hazle Android CI
+name: Hazle Android CI/CD
 
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ] # Triggers release when pushed a tag
   pull_request:
     branches: [ "main" ]
+
+permissions:
+  contents: write # Required to create GitHub Releases
 
 jobs:
   build:
@@ -24,7 +28,31 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run Tests and Build
-        run: ./gradlew build
+      # 1. Build & Sentry Upload
+      - name: Build with Gradle
+        run: ./gradlew assembleRelease
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      # 2. Sign the APK
+      - name: Sign APK
+        if: github.event_name != 'pull_request'
+        uses: r0adkll/sign-android-release@v1
+        id: sign_app
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.KEYSTORE_BASE64 }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      # 3. Create GitHub Release
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --title "Hazle ${{ github.ref_name }}" \
+            --generate-notes \
+            "${{ steps.sign_app.outputs.signedReleaseFile }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
