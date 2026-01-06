@@ -26,3 +26,5 @@ jobs:
 
       - name: Run Tests and Build
         run: ./gradlew build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
