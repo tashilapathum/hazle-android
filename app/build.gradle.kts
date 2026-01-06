@@ -116,6 +116,6 @@ dependencies {
 
 sentry {
     org.set("tashila-pathum")
-    projectName.set("android")
+    projectName.set("hazle-android")
     includeSourceContext.set(true)
 }
