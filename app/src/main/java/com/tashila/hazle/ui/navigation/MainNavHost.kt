@@ -1,9 +1,10 @@
 package com.tashila.hazle.ui.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -26,28 +27,28 @@ fun MainNavHost(
         navController = navController,
         startDestination = AppDestinations.ONBOARDING_ROUTE,
         enterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                animationSpec = spring()
-            ) + fadeIn(animationSpec = spring())
+            scaleIn(
+                initialScale = 0.8f,
+                animationSpec = tween(300)
+            ) + fadeIn(animationSpec = tween(300))
         },
         exitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                animationSpec = spring()
-            ) + fadeOut(animationSpec = spring())
+            scaleOut(
+                targetScale = 1.1f,
+                animationSpec = tween(300)
+            ) + fadeOut(animationSpec = tween(300))
         },
         popEnterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.End,
-                animationSpec = spring()
-            ) + fadeIn(animationSpec = spring())
+            scaleIn(
+                initialScale = 1.1f,
+                animationSpec = tween(300)
+            ) + fadeIn(animationSpec = tween(300))
         },
         popExitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.End,
-                animationSpec = spring()
-            ) + fadeOut(animationSpec = spring())
+            scaleOut(
+                targetScale = 0.8f,
+                animationSpec = tween(300)
+            ) + fadeOut(animationSpec = tween(300))
         }
     ) {
         composable(AppDestinations.THREADS_ROUTE) {
