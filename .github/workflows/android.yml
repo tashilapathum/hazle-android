@@ -2,13 +2,10 @@ name: Hazle Android CI/CD
 
 on:
   push:
-    branches: [ "main" ]
-    tags: [ "v*" ] # Triggers release when pushed a tag
-  pull_request:
-    branches: [ "main" ]
+    tags: [ "v*" ]
 
 permissions:
-  contents: write # Required to create GitHub Releases
+  contents: write 
 
 jobs:
   build:
