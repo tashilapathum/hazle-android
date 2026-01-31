@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.tashila.hazle.R
 import com.tashila.hazle.features.settings.SettingsViewModel
 import com.tashila.hazle.ui.activities.LoginActivity
-import com.tashila.hazle.ui.components.ConfirmationDialog
+import com.tashila.hazle.ui.components.dialogs.ConfirmationDialog
 import com.tashila.hazle.ui.components.settings.AccountInfoSection
 import com.tashila.hazle.ui.components.settings.ApiUrlSettingDialog
 import com.tashila.hazle.ui.components.settings.OpenAIApiKeyDialog

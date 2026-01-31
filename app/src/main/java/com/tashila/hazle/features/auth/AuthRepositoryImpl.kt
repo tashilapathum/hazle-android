@@ -47,14 +47,12 @@ class AuthRepositoryImpl(
         }
     }
 
-    override suspend fun signUp(request: SupabaseSignUpRequest): Result<SupabaseAuthResponse> {
+    override suspend fun signUp(request: SupabaseSignUpRequest): Result<SupabaseVerifyResponse> {
         return try {
             val response: HttpResponse = authApiService.signUp(request)
             val responseBody = response.bodyAsText()
             if (response.status.isSuccess()) {
-                val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
-                tokenRepository.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
-                settingsRepository.saveUserInfo(parsedResponse)
+                val parsedResponse = jsonDecoder.decodeFromString<SupabaseVerifyResponse>(responseBody)
                 Result.success(parsedResponse)
             } else { // If the response indicates an error (non-2xx status code)
                 try {
@@ -127,6 +125,36 @@ class AuthRepositoryImpl(
             tokenRepository.clearTokens()
             false
         }
+    }
+
+    override suspend fun resend(email: String): Result<Unit> {
+        return try {
+            val request = ResendEmailRequest(email)
+            val response: HttpResponse = authApiService.resendEmail(request)
+            val responseBody = response.bodyAsText()
+
+            if (response.status.isSuccess()) {
+                Result.success(Unit)
+            } else {
+                try {
+                    val backendError = jsonDecoder.decodeFromString<BackendErrorMessage>(responseBody)
+                    when (response.status) {
+                        HttpStatusCode.BadRequest -> Result.failure(AuthException.InvalidInput(backendError.message))
+                        HttpStatusCode.InternalServerError -> Result.failure(AuthException.ServerError(backendError.message))
+                        else -> Result.failure(AuthException.UnknownError("Unexpected error: ${backendError.message}"))
+                    }
+                } catch (jsonParseE: Exception) {
+                    Log.e(TAG, "Failed to parse error. Raw: $responseBody", jsonParseE)
+                    Result.failure(AuthException.ServerError("Resend failed: Unexpected server error."))
+                }
+            }
+        } catch (e: Exception) {
+            Result.failure(AuthException.NetworkError("Network error: ${e.message}", e))
+        }
+    }
+
+    override suspend fun confirm(refreshToken: String?, accessToken: String?) {
+        tokenRepository.saveTokens(accessToken, refreshToken)
     }
 
     override suspend fun clearAuthData() {

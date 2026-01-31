@@ -1,8 +1,14 @@
 package com.tashila.hazle.features.auth
 
 import android.util.Log
+import android.util.Patterns
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -10,6 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
+    var resendTimer by mutableIntStateOf(0)
+    var isResending by mutableStateOf(false)
 
     // UI State for Login/Signup Inputs
     private val _email = MutableStateFlow("")
@@ -128,7 +136,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
                     password = _password.value
                 )
                 authRepository.signUp(request)
-                    .onSuccess { authResponse ->
+                    .onSuccess { _ ->
                         _authEvent.emit(AuthEvent.SignupSuccess)
                     }
                     .onFailure { exception ->
@@ -155,11 +163,31 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
         }
     }
 
+    fun verifyEmail(accessToken: String?, refreshToken: String?) {
+        viewModelScope.launch {
+            if (refreshToken != null && accessToken != null) {
+                authRepository.confirm(refreshToken, accessToken)
+                _authEvent.emit(AuthEvent.VerifySuccess)
+            }
+            else
+                _errorMessage.value = "An unexpected error occurred"
+        }
+    }
+
+    fun resendEmail(email: String) {
+        viewModelScope.launch {
+            isResending = true
+            authRepository.resend(email)
+            startTimer()
+            isResending = false
+        }
+    }
+
     private fun validateEmail(email: String): String? {
         if (email.isBlank()) {
             return "Email cannot be empty."
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             return "Please enter a valid email address."
         }
         return null
@@ -175,10 +203,21 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
         return null
     }
 
+    fun startTimer() {
+        resendTimer = 120
+        viewModelScope.launch {
+            while (resendTimer > 0) {
+                delay(1000)
+                resendTimer--
+            }
+        }
+    }
+
     // --- Auth Event for Navigation ---
     sealed class AuthEvent {
         object LoginSuccess : AuthEvent()
         object SignupSuccess : AuthEvent()
+        object VerifySuccess : AuthEvent()
     }
 
     companion object {

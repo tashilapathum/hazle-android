@@ -11,6 +11,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tashila.hazle.features.chat.ChatViewModel
+import com.tashila.hazle.ui.navigation.AppDestinations.ONBOARDING_ROUTE
+import com.tashila.hazle.ui.navigation.AppDestinations.SETTINGS_ROUTE
+import com.tashila.hazle.ui.navigation.AppDestinations.THREADS_ROUTE
+import com.tashila.hazle.ui.navigation.AppDestinations.chatDetailRoute
 import com.tashila.hazle.ui.screens.ChatScreen
 import com.tashila.hazle.ui.screens.OnboardingScreen
 import com.tashila.hazle.ui.screens.SettingsScreen
@@ -25,46 +29,38 @@ fun MainNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = AppDestinations.ONBOARDING_ROUTE,
+        startDestination = THREADS_ROUTE,
         enterTransition = {
-            scaleIn(
-                initialScale = 0.8f,
-                animationSpec = tween(300)
-            ) + fadeIn(animationSpec = tween(300))
+            scaleIn(initialScale = 0.8f, animationSpec = tween()
+            ) + fadeIn(animationSpec = tween())
         },
         exitTransition = {
-            scaleOut(
-                targetScale = 1.1f,
-                animationSpec = tween(300)
-            ) + fadeOut(animationSpec = tween(300))
+            scaleOut(targetScale = 1.1f, animationSpec = tween()
+            ) + fadeOut(animationSpec = tween())
         },
         popEnterTransition = {
-            scaleIn(
-                initialScale = 1.1f,
-                animationSpec = tween(300)
-            ) + fadeIn(animationSpec = tween(300))
+            scaleIn(initialScale = 1.1f, animationSpec = tween()
+            ) + fadeIn(animationSpec = tween())
         },
         popExitTransition = {
-            scaleOut(
-                targetScale = 0.8f,
-                animationSpec = tween(300)
-            ) + fadeOut(animationSpec = tween(300))
+            scaleOut(targetScale = 0.8f, animationSpec = tween()
+            ) + fadeOut(animationSpec = tween())
         }
     ) {
-        composable(AppDestinations.THREADS_ROUTE) {
+        composable(THREADS_ROUTE) {
             ThreadsScreen(
                 onClickSettings = {
-                    navController.navigate(AppDestinations.SETTINGS_ROUTE)
+                    navController.navigate(SETTINGS_ROUTE)
                 },
                 onCreateNewChat = {
                     // When creating a new chat, pass -1L to signify no existing thread ID
                     chatViewModel.startNewChat()
-                    navController.navigate(AppDestinations.chatDetailRoute(-1L))
+                    navController.navigate(chatDetailRoute(-1L))
                 },
                 onThreadSelected = { localThreadId ->
                     // Set active thread in ViewModel and navigate with the specific ID
                     chatViewModel.setActiveThread(localThreadId)
-                    navController.navigate(AppDestinations.chatDetailRoute(localThreadId))
+                    navController.navigate(chatDetailRoute(localThreadId))
                 },
                 threadsViewModel = koinViewModel()
             )
@@ -79,22 +75,22 @@ fun MainNavHost(
             // ChatScreen will now receive the localThreadId directly from navigation
             ChatScreen(
                 onCloseChat = {
-                    navController.navigate(AppDestinations.THREADS_ROUTE) {
-                        popUpTo(AppDestinations.THREADS_ROUTE) { inclusive = true }
+                    navController.navigate(THREADS_ROUTE) {
+                        popUpTo(THREADS_ROUTE) { inclusive = true }
                     }
                 },
                 viewModel = chatViewModel,
                 initialThreadId = localThreadId
             )
         }
-        composable(AppDestinations.SETTINGS_ROUTE) {
+        composable(SETTINGS_ROUTE) {
             SettingsScreen(
                 onBackClicked = {
                     navController.popBackStack()
                 }
             )
         }
-        composable(AppDestinations.ONBOARDING_ROUTE) {
+        composable(ONBOARDING_ROUTE) {
             OnboardingScreen(
                 pagerState = rememberPagerState(
                     0,

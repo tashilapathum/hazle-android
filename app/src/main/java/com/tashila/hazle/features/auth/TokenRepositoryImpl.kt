@@ -18,13 +18,24 @@ class TokenRepositoryImpl(context: Context) : TokenRepository {
     private val dataStore: DataStore<ByteArray> = context.encryptedAuthDataStore
     private val json = Json { ignoreUnknownKeys = true } // Kotlinx Serialization JSON parser
 
-    override suspend fun saveTokens(accessToken: String, refreshToken: String) {
-        val tokenMap = mapOf(
-            "accessToken" to accessToken,
-            "refreshToken" to refreshToken
-        )
-        val jsonString = json.encodeToString(tokenMap)
-        dataStore.updateData { jsonString.toByteArray(Charsets.UTF_8) } // Convert string to bytes
+    override suspend fun saveTokens(accessToken: String?, refreshToken: String?) {
+        dataStore.updateData { currentBytes ->
+            // 1. Decode existing data
+            val currentJson = if (currentBytes.isNotEmpty()) {
+                json.decodeFromString<Map<String, String?>>(currentBytes.decodeToString())
+            } else {
+                emptyMap()
+            }
+
+            // 2. Merge values: Use new value if non-null, otherwise keep old
+            val updatedMap = mapOf(
+                "accessToken" to (accessToken ?: currentJson["accessToken"]),
+                "refreshToken" to (refreshToken ?: currentJson["refreshToken"])
+            )
+
+            // 3. Encode and return
+            json.encodeToString(updatedMap).toByteArray(Charsets.UTF_8)
+        }
     }
 
     override suspend fun getAccessToken(): String? {
