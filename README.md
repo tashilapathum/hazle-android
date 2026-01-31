@@ -1,5 +1,7 @@
 # Hazle - Android App
 
+https://github.com/user-attachments/assets/28a4a0a0-ffc9-4aa6-bb5b-0e826340217d
+
 **Hazle** is yet another AI chatbot assistant designed with Android system integration in mind. Instead of switching apps, users can highlight text anywhere in the Android system, process it through the context menu, and receive an AI-generated response via a background notification.
 
 > **Note:** This is the Android client. The Ktor-based backend logic can be found at [hazle-backend](https://github.com/tashilapathum/hazle-backend).
