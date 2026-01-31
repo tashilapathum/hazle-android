@@ -27,6 +27,12 @@ data class SupabaseAuthResponse(
 )
 
 @Serializable
+data class SupabaseVerifyResponse(
+    val message: String,
+    val email: String
+)
+
+@Serializable
 data class BackendErrorMessage(
     val message: String
 )
@@ -34,6 +40,11 @@ data class BackendErrorMessage(
 @Serializable
 data class RefreshTokenRequest(
     val refreshToken: String
+)
+
+@Serializable
+data class ResendEmailRequest(
+    val email: String
 )
 
 @Serializable

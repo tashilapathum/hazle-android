@@ -1,15 +1,20 @@
 package com.tashila.hazle.ui.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tashila.hazle.features.chat.ChatViewModel
+import com.tashila.hazle.ui.navigation.AppDestinations.ONBOARDING_ROUTE
+import com.tashila.hazle.ui.navigation.AppDestinations.SETTINGS_ROUTE
+import com.tashila.hazle.ui.navigation.AppDestinations.THREADS_ROUTE
+import com.tashila.hazle.ui.navigation.AppDestinations.chatDetailRoute
 import com.tashila.hazle.ui.screens.ChatScreen
 import com.tashila.hazle.ui.screens.OnboardingScreen
 import com.tashila.hazle.ui.screens.SettingsScreen
@@ -24,46 +29,38 @@ fun MainNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = AppDestinations.ONBOARDING_ROUTE,
+        startDestination = THREADS_ROUTE,
         enterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                animationSpec = spring()
-            ) + fadeIn(animationSpec = spring())
+            scaleIn(initialScale = 0.8f, animationSpec = tween()
+            ) + fadeIn(animationSpec = tween())
         },
         exitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                animationSpec = spring()
-            ) + fadeOut(animationSpec = spring())
+            scaleOut(targetScale = 1.1f, animationSpec = tween()
+            ) + fadeOut(animationSpec = tween())
         },
         popEnterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.End,
-                animationSpec = spring()
-            ) + fadeIn(animationSpec = spring())
+            scaleIn(initialScale = 1.1f, animationSpec = tween()
+            ) + fadeIn(animationSpec = tween())
         },
         popExitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.End,
-                animationSpec = spring()
-            ) + fadeOut(animationSpec = spring())
+            scaleOut(targetScale = 0.8f, animationSpec = tween()
+            ) + fadeOut(animationSpec = tween())
         }
     ) {
-        composable(AppDestinations.THREADS_ROUTE) {
+        composable(THREADS_ROUTE) {
             ThreadsScreen(
                 onClickSettings = {
-                    navController.navigate(AppDestinations.SETTINGS_ROUTE)
+                    navController.navigate(SETTINGS_ROUTE)
                 },
                 onCreateNewChat = {
                     // When creating a new chat, pass -1L to signify no existing thread ID
                     chatViewModel.startNewChat()
-                    navController.navigate(AppDestinations.chatDetailRoute(-1L))
+                    navController.navigate(chatDetailRoute(-1L))
                 },
                 onThreadSelected = { localThreadId ->
                     // Set active thread in ViewModel and navigate with the specific ID
                     chatViewModel.setActiveThread(localThreadId)
-                    navController.navigate(AppDestinations.chatDetailRoute(localThreadId))
+                    navController.navigate(chatDetailRoute(localThreadId))
                 },
                 threadsViewModel = koinViewModel()
             )
@@ -78,22 +75,22 @@ fun MainNavHost(
             // ChatScreen will now receive the localThreadId directly from navigation
             ChatScreen(
                 onCloseChat = {
-                    navController.navigate(AppDestinations.THREADS_ROUTE) {
-                        popUpTo(AppDestinations.THREADS_ROUTE) { inclusive = true }
+                    navController.navigate(THREADS_ROUTE) {
+                        popUpTo(THREADS_ROUTE) { inclusive = true }
                     }
                 },
                 viewModel = chatViewModel,
                 initialThreadId = localThreadId
             )
         }
-        composable(AppDestinations.SETTINGS_ROUTE) {
+        composable(SETTINGS_ROUTE) {
             SettingsScreen(
                 onBackClicked = {
                     navController.popBackStack()
                 }
             )
         }
-        composable(AppDestinations.ONBOARDING_ROUTE) {
+        composable(ONBOARDING_ROUTE) {
             OnboardingScreen(
                 pagerState = rememberPagerState(
                     0,

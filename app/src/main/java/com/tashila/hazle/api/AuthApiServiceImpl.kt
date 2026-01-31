@@ -1,6 +1,7 @@
 package com.tashila.hazle.api
 
 import com.tashila.hazle.features.auth.RefreshTokenRequest
+import com.tashila.hazle.features.auth.ResendEmailRequest
 import com.tashila.hazle.features.auth.SupabaseSignInRequest
 import com.tashila.hazle.features.auth.SupabaseSignUpRequest
 import com.tashila.hazle.features.settings.SettingsRepository
@@ -35,6 +36,13 @@ class AuthApiServiceImpl(
         return httpClient.post("${baseUrl}auth/refresh") {
             contentType(ContentType.Application.Json)
             setBody(request)
+        }
+    }
+
+    override suspend fun resendEmail(resendEmailRequest: ResendEmailRequest): HttpResponse {
+        return httpClient.post("${baseUrl}auth/resend") {
+            contentType(ContentType.Application.Json)
+            setBody(resendEmailRequest)
         }
     }
 }

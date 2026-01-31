@@ -4,10 +4,23 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
 object AppDestinations {
-    const val THREADS_ROUTE = "threads_list"
-    const val SETTINGS_ROUTE = "app_settings"
-    const val ONBOARDING_ROUTE = "app_onboarding"
-    const val CHAT_VIEW_BASE_ROUTE = "chat_view"
+
+    /*----------------------------- Auth -----------------------------*/
+
+    const val HOME_ROUTE = "home"
+    const val SIGNUP_ROUTE = "signup"
+    const val LOGIN_ROUTE = "login"
+    const val VERIFY_ROUTE = "verify"
+
+    /*----------------------------- Main -----------------------------*/
+
+    const val THREADS_ROUTE = "threads"
+    const val SETTINGS_ROUTE = "settings"
+    const val ONBOARDING_ROUTE = "onboarding"
+
+    /*----------------------------- Chats -----------------------------*/
+
+    const val CHAT_VIEW_BASE_ROUTE = "chat"
     // The argument name must match the one used in navArgument()
     const val CHAT_VIEW_ROUTE_WITH_ARGS = "$CHAT_VIEW_BASE_ROUTE/{localThreadId}"
     fun chatDetailRoute(localThreadId: Long? = null): String {
