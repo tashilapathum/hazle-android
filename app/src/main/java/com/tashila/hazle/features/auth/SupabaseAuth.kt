@@ -55,7 +55,7 @@ data class SupabaseUser(
     @SerialName("updated_at") val updatedAt: String,
     @SerialName("email_confirmed_at") val emailConfirmedAt: String? = null,
     @SerialName("phone_confirmed_at") val phoneConfirmedAt: String? = null,
-    @SerialName("aud") val aud: String? = null, // Example: based on your previous error
+    @SerialName("aud") val aud: String? = null,
     @SerialName("role") val role: String? = null,
     @SerialName("phone") val phone: String? = null,
     @SerialName("last_sign_in_at") val lastSignInAt: String? = null,
