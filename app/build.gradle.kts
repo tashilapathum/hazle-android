@@ -57,6 +57,10 @@ android {
             listOf("en", "de", "si")
         )
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -79,15 +83,22 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.material)
 
+    // Data
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.datastore.preferences)
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.slf4j.simple)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Debugging
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 

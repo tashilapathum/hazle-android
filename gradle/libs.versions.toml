@@ -1,6 +1,9 @@
 [versions]
 agp = "8.11.1"
+kotlinxCoroutinesTest = "1.10.2"
 material = "1.12.0"
+mockk = "1.14.9"
+slf4jSimple = "2.0.17"
 splashscreen = "1.2.0-rc01"
 koin = "4.1.0"
 kotlin = "2.1.21"
@@ -23,6 +26,7 @@ materialIcons = "1.7.8"
 foundation = "1.8.3"
 sentry = "5.8.0"
 coil = "2.7.0"
+turbine = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +58,7 @@ androidx-compose-foundation = { group = "androidx.compose.foundation", name = "f
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
@@ -63,11 +68,14 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 auth0-jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "auth0-jwtdecode" }
 
 material = { module = "com.google.android.material:material", version.ref = "material" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
