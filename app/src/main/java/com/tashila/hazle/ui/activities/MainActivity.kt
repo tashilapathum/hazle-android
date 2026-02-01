@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
                 val context = LocalContext.current
                 val navController = rememberNavController()
                 val coroutineScope = rememberCoroutineScope()
-                var showSessionTimeOut by remember { mutableStateOf(false) }
                 var askNotificationPermission by remember { mutableStateOf(false) }
 
                 // Set language
@@ -79,15 +78,19 @@ class MainActivity : AppCompatActivity() {
 
                     if (!isOnboarded) {
                         // User is not onboarded, show onboarding
-                        // MainNavHost will handle showing the onboarding route
+                        navController.navigate(AppDestinations.ONBOARDING_ROUTE) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true // Clear back stack up to start destination
+                            }
+                        }
                     } else if (!isAuthenticated) {
-                        // User is onboarded but not logged in, prompt login
-                        showSessionTimeOut = true
+                        // User is onboarded but not logged in, show login
+                        showLogin(this@MainActivity)
                     } else {
                         // User is onboarded and logged in, navigate to threads and ask for permission
                         navController.navigate(AppDestinations.THREADS_ROUTE) {
                             popUpTo(navController.graph.startDestinationId) {
-                                inclusive = true // Clear back stack up to start destination
+                                inclusive = true
                             }
                         }
                         askNotificationPermission = true
@@ -143,7 +146,6 @@ class MainActivity : AppCompatActivity() {
                         if (askNotificationPermission) RequestNotificationPermission()
                     }
                 }
-                if (showSessionTimeOut) PromptLogin(context)
             }
         }
     }
@@ -156,22 +158,6 @@ class MainActivity : AppCompatActivity() {
 fun setAppLocale(localeTag: String) {
     val localeList = LocaleListCompat.forLanguageTags(localeTag)
     AppCompatDelegate.setApplicationLocales(localeList)
-}
-
-@Composable
-private fun PromptLogin(context: Context) {
-    AlertDialog(
-        onDismissRequest = { },
-        title = { Text(text = stringResource(R.string.session_timeout_title)) },
-        text = { Text(text = stringResource(R.string.session_timeout_message)) },
-        confirmButton = {
-            TextButton (
-                onClick = { showLogin(context) }
-            ) {
-                Text(stringResource(R.string.ok))
-            }
-        }
-    )
 }
 
 private fun showLogin(context: Context) {
@@ -206,7 +192,6 @@ fun RequestNotificationPermission() {
             }
         )
     }
-
 }
 
 @Composable
