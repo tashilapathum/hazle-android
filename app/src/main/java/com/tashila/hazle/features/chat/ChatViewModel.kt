@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 
 class ChatViewModel(
     private val chatRepository: ChatRepository,
@@ -146,7 +147,9 @@ class ChatViewModel(
     private fun getGreeting(): Flow<List<Message>> {
         return flowOf(listOf(Message(
             text = "Hi, I'm Hazle, your AI assistant. I'll always try to give concise answers.",
-            isFromMe = false
+            isFromMe = false,
+            id = Clock.System.now().toEpochMilliseconds(),
+            timestamp = Clock.System.now(),
         )))
     }
 

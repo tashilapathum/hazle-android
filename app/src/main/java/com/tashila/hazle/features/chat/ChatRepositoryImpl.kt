@@ -10,7 +10,7 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
-import kotlin.time.Clock.System
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -18,18 +18,20 @@ class ChatRepositoryImpl(
     private val apiService: ApiService,
     private val messageDao: MessageDao,
     private val threadDao: ThreadDao,
-    private val jsonDecoder: Json
+    private val jsonDecoder: Json,
+    private val clock: Clock
 ) : ChatRepository {
 
     override suspend fun sendUserMessage(localThreadId: Long, aiThreadId: String?, message: String): String {
         // check if there's a stored one because it updates after receiving the first response
         val finalAiThreadId = aiThreadId ?: threadDao.getThreadById(localThreadId)?.aiThreadId
 
+        val now = clock.now()
         val newMessage = Message(
-            id = System.now().toEpochMilliseconds(),
+            id = now.toEpochMilliseconds(),
             text = message.trim(),
             isFromMe = true,
-            timestamp = System.now(),
+            timestamp = now,
             aiThreadId = finalAiThreadId
         )
 
@@ -37,25 +39,25 @@ class ChatRepositoryImpl(
         updateThread(newMessage, localThreadId)
         val response = apiService.sendMessage(newMessage)
         val responseBody = response.bodyAsText()
-        val message = try {
+        val receivedMessage = try {
             jsonDecoder.decodeFromString<Message>(responseBody)
         } catch (e: Exception) {
             Log.e(TAG, "sendUserMessage: Failed to decode JSON", e)
+            val errorTime = clock.now()
             Message(
+                id = errorTime.toEpochMilliseconds(),
+                timestamp = errorTime,
                 text = "Something went wrong",
                 isFromMe = false
             )
         }
-        storeAiMessage(localThreadId, message)
-        return message.text
+        storeAiMessage(localThreadId, receivedMessage)
+        return receivedMessage.text
     }
 
     override suspend fun storeAiMessage(localThreadId: Long, message: Message) {
-        val newMessage = message.copy(
-            timestamp = System.now()
-        )
-        updateThread(newMessage, localThreadId)
-        messageDao.insertMessage(newMessage.toEntity(localThreadId))
+        updateThread(message, localThreadId)
+        messageDao.insertMessage(message.toEntity(localThreadId))
     }
 
     private suspend fun updateThread(message: Message, localThreadId: Long) {

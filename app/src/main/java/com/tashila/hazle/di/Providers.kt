@@ -19,6 +19,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlin.time.Clock
 
 fun provideJsonDecoder(): Json {
     return Json {
@@ -26,6 +27,10 @@ fun provideJsonDecoder(): Json {
         isLenient = true
         prettyPrint = true
     }
+}
+
+fun provideClock(): Clock {
+    return Clock.System
 }
 
 // Dedicated HttpClient for Auth calls (without Auth plugin to avoid circular dependencies)
