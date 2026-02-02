@@ -54,9 +54,11 @@ val appModule = module {
         clock = get()
     ) }
     single<ThreadRepository> { ThreadRepositoryImpl(get()) }
-    single<SettingsRepository> { SettingsRepositoryImpl(androidContext()) }
+    single<SettingsRepository> { SettingsRepositoryImpl(get()) }
 
+    // --- Context-dependant Providers ---
     single { provideClock() }
+    single { provideDataStore(androidContext()) }
 
     // --- Room Database ---
     single { provideDatabase(get()) }
