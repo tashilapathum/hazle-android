@@ -32,8 +32,9 @@ class AuthRepositoryImpl(
                 try {
                     val backendError = jsonDecoder.decodeFromString<BackendErrorMessage>(responseBody)
                     when (response.status) {
-                        HttpStatusCode.BadRequest -> Result.failure(AuthException.InvalidCredentials(backendError.message))
-                        HttpStatusCode.Unauthorized -> Result.failure(AuthException.InvalidCredentials(backendError.message))
+                        HttpStatusCode.BadRequest -> Result.failure(AuthException.InvalidCredentials())
+                        HttpStatusCode.Unauthorized -> Result.failure(AuthException.InvalidCredentials())
+                        HttpStatusCode.TooManyRequests -> Result.failure(AuthException.TooManyRequests())
                         HttpStatusCode.InternalServerError -> Result.failure(AuthException.ServerError(backendError.message))
                         else -> Result.failure(AuthException.UnknownError("An unexpected backend error occurred: ${backendError.message}"))
                     }
@@ -43,7 +44,8 @@ class AuthRepositoryImpl(
                 }
             }
         } catch (e: Exception) {
-            Result.failure(AuthException.NetworkError("Network error during sign-in: ${e.message}", e))
+            Log.e(TAG, "Network error during sign-in", e)
+            Result.failure(AuthException.NetworkError("Network error. Please check your connection and try again."))
         }
     }
 
@@ -58,9 +60,10 @@ class AuthRepositoryImpl(
                 try {
                     val backendError = jsonDecoder.decodeFromString<BackendErrorMessage>(responseBody)
                     when (response.status) {
-                        HttpStatusCode.Conflict -> Result.failure(AuthException.UserAlreadyExists(backendError.message))
-                        HttpStatusCode.BadRequest -> Result.failure(AuthException.InvalidInput(backendError.message))
-                        HttpStatusCode.Unauthorized -> Result.failure(AuthException.InvalidCredentials(backendError.message))
+                        HttpStatusCode.Conflict -> Result.failure(AuthException.UserAlreadyExists())
+                        HttpStatusCode.BadRequest -> Result.failure(AuthException.InvalidInput())
+                        HttpStatusCode.TooManyRequests -> Result.failure(AuthException.TooManyRequests())
+                        HttpStatusCode.Unauthorized -> Result.failure(AuthException.InvalidCredentials())
                         HttpStatusCode.InternalServerError -> Result.failure(AuthException.ServerError(backendError.message))
                         else -> Result.failure(AuthException.UnknownError("An unexpected backend error occurred: ${backendError.message}"))
                     }
@@ -70,7 +73,8 @@ class AuthRepositoryImpl(
                 }
             }
         } catch (e: Exception) {
-            Result.failure(AuthException.NetworkError("Network error during signup: ${e.message}", e))
+            Log.e(TAG, "Network error during sign-up", e)
+            Result.failure(AuthException.NetworkError("Network error. Please check your connection and try again."))
         }
     }
 
@@ -84,9 +88,10 @@ class AuthRepositoryImpl(
 
         try {
             val jwt = JWT(accessToken)
-            val expiresAt = jwt.expiresAt
+            val expiresAt: Date? = jwt.expiresAt
+            val needsRefresh = expiresAt?.before(Date()) ?: true // Refresh if expired or no expiry info
 
-            return if (expiresAt == null || expiresAt.before(Date())) {
+            return if (needsRefresh) {
                 refresh(refreshToken)
             } else {
                 true
@@ -99,7 +104,7 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun refresh(refreshToken: String): Boolean {
-        return try {
+        try {
             val response: HttpResponse = authApiService.refreshToken(RefreshTokenRequest(refreshToken))
             val responseBody = response.bodyAsText()
 
@@ -107,24 +112,21 @@ class AuthRepositoryImpl(
                 val parsedResponse = jsonDecoder.decodeFromString<SupabaseAuthResponse>(responseBody)
                 tokenRepository.saveTokens(parsedResponse.accessToken, parsedResponse.refreshToken)
                 settingsRepository.saveUserInfo(parsedResponse)
-                true
+                return true
             } else {
-                try {
-                    val backendError = jsonDecoder.decodeFromString<BackendErrorMessage>(responseBody)
-                    Log.e(TAG, "Token refresh failed: ${response.status.value}: ${backendError.message}. Clearing auth data.")
-                    tokenRepository.clearTokens()
-                    false
-                } catch (jsonParseE: Exception) {
-                    Log.e(TAG, "Failed to parse backend error response for token refresh. Raw: $responseBody. Error: ${jsonParseE.message}", jsonParseE)
-                    tokenRepository.clearTokens()
-                    false
+                val errorMessage = try {
+                    jsonDecoder.decodeFromString<BackendErrorMessage>(responseBody).message
+                } catch (e: Exception) {
+                    "Failed to parse error response. Raw body: $responseBody"
                 }
+                Log.e(TAG, "Token refresh failed: ${response.status.value}: $errorMessage. Clearing auth data.")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Token refresh request failed.", e)
-            tokenRepository.clearTokens()
-            false
         }
+
+        tokenRepository.clearTokens()
+        return false
     }
 
     override suspend fun resend(email: String): Result<Unit> {
@@ -139,7 +141,7 @@ class AuthRepositoryImpl(
                 try {
                     val backendError = jsonDecoder.decodeFromString<BackendErrorMessage>(responseBody)
                     when (response.status) {
-                        HttpStatusCode.BadRequest -> Result.failure(AuthException.InvalidInput(backendError.message))
+                        HttpStatusCode.BadRequest -> Result.failure(AuthException.InvalidInput())
                         HttpStatusCode.InternalServerError -> Result.failure(AuthException.ServerError(backendError.message))
                         else -> Result.failure(AuthException.UnknownError("Unexpected error: ${backendError.message}"))
                     }
@@ -149,7 +151,8 @@ class AuthRepositoryImpl(
                 }
             }
         } catch (e: Exception) {
-            Result.failure(AuthException.NetworkError("Network error: ${e.message}", e))
+            Log.e(TAG, "Network error during resend", e)
+            Result.failure(AuthException.NetworkError("Network error. Please check your connection and try again."))
         }
     }
 

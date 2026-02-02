@@ -1,12 +1,10 @@
 package com.tashila.hazle.features.settings
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.tashila.hazle.features.auth.SupabaseAuthResponse
 import com.tashila.hazle.features.auth.UserInfo
 import com.tashila.hazle.utils.SERVER_URL
@@ -17,13 +15,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import java.util.Locale
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
 /**
  * Implementation of the SettingsRepository using Jetpack DataStore for persistence.
  * This version uses DataStore for API URL and in-memory MutableStateFlow for user info simulation.
  */
-class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepository {
+class SettingsRepositoryImpl(private val dataStore: DataStore<Preferences>) : SettingsRepository {
 
     // Preference key for storing the API URL
     private object PreferencesKeys {
@@ -45,7 +41,7 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
         )
         val userInfoJson = Json.encodeToString(userInfo)
 
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[PreferencesKeys.USER_INFO] = userInfoJson
         }
     }
@@ -56,7 +52,7 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
     override fun getUserInfo(): Flow<UserInfo> { // Changed return type to UserInfo? to handle null
         val defaultId = "Hazle User"
         val defaultEmail = "user@email.com"
-        return context.dataStore.data
+        return dataStore.data
             .map { preferences ->
                 val userInfoJson = preferences[PreferencesKeys.USER_INFO]
                 userInfoJson?.let {
@@ -72,7 +68,7 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
      * Saves the API URL to DataStore.
      */
     override suspend fun saveApiUrl(url: String) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[PreferencesKeys.API_URL] = url
         }
     }
@@ -81,7 +77,7 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
      * Retrieves the API URL from DataStore as a Flow.
      */
     override fun getApiUrl(): Flow<String> {
-        return context.dataStore.data
+        return dataStore.data
             .map { preferences ->
                 preferences[PreferencesKeys.API_URL] ?: SERVER_URL
             }
@@ -92,14 +88,14 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
     }
 
     override suspend fun saveOnboardState(isDone: Boolean) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[PreferencesKeys.ONBOARD_DONE] = isDone
         }
     }
 
     override fun isOnboarded(): Boolean {
         return runBlocking {
-            context.dataStore.data
+            dataStore.data
                 .map { preferences ->
                     preferences[PreferencesKeys.ONBOARD_DONE] ?: false
                 }.first()
@@ -110,7 +106,7 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
      * Saves the selected locale tag to DataStore.
      */
     override suspend fun saveLocale(localeTag: String) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[PreferencesKeys.LOCALE_TAG] = localeTag
         }
     }
@@ -119,7 +115,7 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
      * Retrieves the locale tag from DataStore as a Flow.
      */
     override fun getLocale(): Flow<String> {
-        return context.dataStore.data
+        return dataStore.data
             .map { preferences ->
                 // Default to the device's current language if no locale is saved
                 preferences[PreferencesKeys.LOCALE_TAG] ?: Locale.getDefault().language
@@ -135,6 +131,6 @@ class SettingsRepositoryImpl(private val context: Context, ) : SettingsRepositor
      * In a real app, this would involve clearing user tokens, navigating to login, etc.
      */
     override suspend fun logout() {
-        context.dataStore.edit { it.clear() }
+        dataStore.edit { it.clear() }
     }
 }

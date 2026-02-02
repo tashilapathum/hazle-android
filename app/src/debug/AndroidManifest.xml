@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- This application tag will be merged with the main manifest -->
+    <application
+        android:usesCleartextTraffic="true"> 
+        <!-- 
+        This flag allows your debug app to make HTTP requests
+        to your local server (e.g., http://192.168.1.186:8080).
+        It will NOT be included in your release build.
+        -->
+    </application>
+</manifest>
+    

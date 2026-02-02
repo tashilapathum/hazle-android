@@ -17,8 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Hazle"
-        android:usesCleartextTraffic="true"
         android:localeConfig="@xml/locale_config"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="33">
         <activity
             android:name=".ui.activities.LoginActivity"

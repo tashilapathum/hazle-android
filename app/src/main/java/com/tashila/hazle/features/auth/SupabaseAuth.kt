@@ -55,10 +55,26 @@ data class SupabaseUser(
     @SerialName("updated_at") val updatedAt: String,
     @SerialName("email_confirmed_at") val emailConfirmedAt: String? = null,
     @SerialName("phone_confirmed_at") val phoneConfirmedAt: String? = null,
-    @SerialName("aud") val aud: String? = null, // Example: based on your previous error
+    @SerialName("aud") val aud: String? = null,
     @SerialName("role") val role: String? = null,
     @SerialName("phone") val phone: String? = null,
     @SerialName("last_sign_in_at") val lastSignInAt: String? = null,
     @SerialName("app_metadata") val appMetadata: JsonElement? = null,
-    @SerialName("user_metadata") val userMetadata: JsonElement? = null
+    @SerialName("user_metadata") val userMetadata: JsonElement? = null,
+    @SerialName("identities") val identities: List<SupabaseIdentity>? = null,
+    @SerialName("is_anonymous") val isAnonymous: Boolean? = null,
+    @SerialName("confirmed_at") val confirmedAt: String? = null
+)
+
+@Serializable
+data class SupabaseIdentity(
+    val provider: String,
+    val id: String,
+    @SerialName("user_id") val userId: String,
+    @SerialName("identity_id") val identityId: String,
+    @SerialName("identity_data") val identityData: JsonElement? = null, // Using JsonElement for simplicity
+    @SerialName("last_sign_in_at") val lastSignInAt: String,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("updated_at") val updatedAt: String,
+    val email: String
 )

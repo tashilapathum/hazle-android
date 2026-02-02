@@ -1,7 +1,6 @@
 package com.tashila.hazle.features.auth
 
 import android.util.Log
-import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -187,11 +186,23 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
         if (email.isBlank()) {
             return "Email cannot be empty."
         }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        // Use the official Android framework regex directly
+        // To avoid using `Patterns` from Android framework
+        val emailRegex = Regex(
+            ("[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                    "\\@" +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                    "(" +
+                    "\\." +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                    ")+")
+        )
+        if (!emailRegex.matches(email)) {
             return "Please enter a valid email address."
         }
         return null
     }
+
 
     private fun validatePassword(password: String): String? {
         if (password.isBlank()) {

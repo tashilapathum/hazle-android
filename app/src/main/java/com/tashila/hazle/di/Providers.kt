@@ -1,6 +1,10 @@
 package com.tashila.hazle.di
 
 import android.app.Application
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.tashila.hazle.db.MainDatabase
 import com.tashila.hazle.db.messages.MessageDao
@@ -19,6 +23,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlin.time.Clock
 
 fun provideJsonDecoder(): Json {
     return Json {
@@ -26,6 +31,15 @@ fun provideJsonDecoder(): Json {
         isLenient = true
         prettyPrint = true
     }
+}
+
+fun provideClock(): Clock {
+    return Clock.System
+}
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+fun provideDataStore(context: Context): DataStore<Preferences> {
+    return context.dataStore
 }
 
 // Dedicated HttpClient for Auth calls (without Auth plugin to avoid circular dependencies)
@@ -116,4 +130,3 @@ fun provideMessageDao(database: MainDatabase): MessageDao {
 fun provideThreadDao(database: MainDatabase): ThreadDao {
     return database.threadDao()
 }
-
