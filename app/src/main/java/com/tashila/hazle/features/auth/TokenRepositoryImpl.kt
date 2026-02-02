@@ -44,7 +44,7 @@ class TokenRepositoryImpl(context: Context) : TokenRepository {
 
         val jsonString = bytes.toString(Charsets.UTF_8) // Convert bytes to string
         val tokenMap = try {
-            json.decodeFromString<Map<String, String>>(jsonString)
+            json.decodeFromString<Map<String, String?>>(jsonString)
         } catch (e: Exception) {
             // Handle deserialization errors (e.g., corrupted JSON)
             println("Error deserializing token data: ${e.message}")
@@ -62,7 +62,7 @@ class TokenRepositoryImpl(context: Context) : TokenRepository {
 
         val jsonString = bytes.toString(Charsets.UTF_8)
         val tokenMap = try {
-            json.decodeFromString<Map<String, String>>(jsonString)
+            json.decodeFromString<Map<String, String?>>(jsonString)
         } catch (e: Exception) {
             println("Error deserializing token data: ${e.message}")
             return null
