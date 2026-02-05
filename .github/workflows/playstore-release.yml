@@ -3,6 +3,7 @@ name: Hazle PlayStore Release
 on:
   release:
     types: [published]
+  workflow_dispatch: # Adds the "Manual" button in GitHub Actions
 
 jobs:
   deploy:
