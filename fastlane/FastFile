@@ -1,0 +1,27 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build AAB and deploy to Play Store Internal Track"
+  lane :deploy do
+    # 1. Build the signed App Bundle (AAB)
+    # This uses the 'app/keystore.jks' we decode in the GH Action
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file"     => "app/keystore.jks",
+        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias"      => ENV["KEY_ALIAS"],
+        "android.injected.signing.key.password"   => ENV["KEY_PASSWORD"]
+      }
+    )
+
+    # 2. Upload to Google Play
+    # Fastlane automatically finds the WIF token via the ENV variable
+    upload_to_play_store(
+      track: 'internal',
+      aab: 'app/build/outputs/bundle/release/app-release.aab',
+      skip_waiting_for_build_processing: true
+    )
+  end
+end
