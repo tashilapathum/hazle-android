@@ -19,6 +19,7 @@ platform :android do
     # 2. Upload to Google Play
     # Fastlane automatically finds the WIF token via the ENV variable
     upload_to_play_store(
+      package_name: 'com.tashila.hazle',
       track: 'internal',
       json_key: ENV["GOOGLE_APPLICATION_CREDENTIALS"],
       aab: 'app/build/outputs/bundle/release/app-release.aab',
