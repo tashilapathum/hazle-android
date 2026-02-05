@@ -1,4 +1,4 @@
-name: Hazle Android CI/CD
+name: Hazle GitHub Release
 
 on:
   push:

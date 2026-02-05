@@ -1,0 +1,2 @@
+json_key_data(File.read(ENV["GOOGLE_APPLICATION_CREDENTIALS"]))
+package_name("com.tashila.hazle")
