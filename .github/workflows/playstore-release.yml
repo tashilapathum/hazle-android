@@ -36,7 +36,10 @@ jobs:
 
       # This converts the Base64 keystore into the actual .jks file Fastlane needs
       - name: Decode Keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/app/keystore.jks
+
+      - name: Debug Keystore Path
+        run: ls -R $GITHUB_WORKSPACE | grep keystore.jks
 
       - name: Run Fastlane Deploy
         run: bundle exec fastlane deploy
