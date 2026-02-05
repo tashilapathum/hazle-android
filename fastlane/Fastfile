@@ -21,7 +21,7 @@ platform :android do
     upload_to_play_store(
       track: 'internal',
       aab: 'app/build/outputs/bundle/release/app-release.aab',
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: true,
       release_status: 'completed',
       ack_bundle_installation_warning: true,
       changes_not_sent_for_review: true
