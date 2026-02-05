@@ -25,6 +25,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Run unit tests
+        run: ./gradlew :app:testDebugUnitTest
+
       # 1. Build & Sentry Upload
       - name: Build with Gradle
         run: ./gradlew assembleRelease
