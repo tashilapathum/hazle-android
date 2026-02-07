@@ -130,4 +130,5 @@ sentry {
     org.set("tashila-pathum")
     projectName.set("hazle-android")
     includeSourceContext.set(true)
+    ignoredBuildTypes.set(setOf("debug"))
 }
