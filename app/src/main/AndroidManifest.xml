@@ -9,7 +9,7 @@
 
     <application
         android:name=".MyApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -103,7 +103,7 @@
     <!-- enable view hierarchy for crashes -->
     <meta-data android:name="io.sentry.attach-view-hierarchy" android:value="true" />
     <!-- enable the performance API by setting a sample-rate, adjust in production env -->
-    <meta-data android:name="io.sentry.traces.sample-rate" android:value="1.0" />
+    <meta-data android:name="io.sentry.traces.sample-rate" android:value="0.25" />
 </application>
 
 </manifest>
