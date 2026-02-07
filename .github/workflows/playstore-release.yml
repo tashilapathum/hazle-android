@@ -3,6 +3,7 @@ name: Hazle PlayStore Release
 on:
   release:
     types: [published]
+  workflow_dispatch: # Adds the "Manual" button in GitHub Actions
 
 jobs:
   deploy:
@@ -31,16 +32,23 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: '3.3'
           bundler-cache: true
 
       # This converts the Base64 keystore into the actual .jks file Fastlane needs
       - name: Decode Keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
+        run: |
+          mkdir -p app
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > ./app/keystore.jks
+
+      - name: Debug Keystore Path
+        run: ls -R $GITHUB_WORKSPACE | grep keystore.jks
 
       - name: Run Fastlane Deploy
         run: bundle exec fastlane deploy
         env:
-          # Fastlane uses these to unlock the keystore.jks file we just created
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
