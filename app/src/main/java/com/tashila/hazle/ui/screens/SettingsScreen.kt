@@ -51,6 +51,7 @@ import com.tashila.hazle.ui.components.settings.ApiUrlSettingDialog
 import com.tashila.hazle.ui.components.settings.OpenAIApiKeyDialog
 import com.tashila.hazle.ui.components.settings.SelectLanguageDialog
 import com.tashila.hazle.ui.components.settings.SettingsItem
+import com.tashila.hazle.ui.components.settings.UpgradeCard
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,6 +119,9 @@ fun SettingsScreen(
                 .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            item {
+                UpgradeCard(onUpgradeClicked = { /*TODO*/ })
+            }
 
             // Account info
             item {

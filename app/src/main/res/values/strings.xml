@@ -80,4 +80,7 @@
     <string name="about_description_version">Version %s</string>
 
     <string name="advanced_settings_section_title">Advanced</string>
+    <string name="upgrade_to_pro_title">Get Pro Access</string>
+    <string name="unlock_all_features">Unlimited messages, advanced models, or bring your own API key.</string>
+    <string name="pro_badge">Pro</string>
 </resources>
