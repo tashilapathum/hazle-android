@@ -30,7 +30,7 @@ import com.tashila.hazle.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpgradeCard(
-    onUpgradeClicked: () -> Unit
+    onClicked: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -38,7 +38,7 @@ fun UpgradeCard(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
-        onClick = onUpgradeClicked,
+        onClick = onClicked,
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         )

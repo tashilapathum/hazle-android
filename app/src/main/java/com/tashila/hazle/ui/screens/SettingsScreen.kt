@@ -58,6 +58,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel(),
+    onUpgradeClicked: () -> Unit = {},
     onBackClicked: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -90,7 +91,7 @@ fun SettingsScreen(
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), // Apply nested scroll
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
                 title = { Text(stringResource(id = R.string.settings_title)) },
@@ -120,7 +121,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                UpgradeCard(onUpgradeClicked = { /*TODO*/ })
+                UpgradeCard(onClicked = { onUpgradeClicked.invoke() })
             }
 
             // Account info

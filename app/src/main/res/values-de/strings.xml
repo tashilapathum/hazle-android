@@ -78,7 +78,67 @@
     <string name="notification_settings_description">App-Benachrichtigungen verwalten</string>
     <string name="about_title">Über</string>
     <string name="about_description_version">Version %s</string>
-
     <string name="advanced_settings_section_title">Erweitert</string>
+
+    <!-- Paywall Screen -->
+
+    <string name="upgrade_to_pro_title">Basis-Version</string>
+    <string name="unlock_all_features">Du nutzt die kostenlose Version. Hol dir Hazle Pro für unbegrenzte Nachrichten, fortschrittliche Modelle oder nutze deinen eigenen API-Key.</string>
+    <string name="pro_badge">Pro holen</string>
+    <string name="developer_support_note">Diese App ist ein Solo-Projekt, um KI-Tools zugänglicher und transparenter zu machen. Deine Unterstützung finanziert die weitere Entwicklung direkt und hält das Projekt am Leben. Vielen Dank!\n\n🌱</string>
+    <string name="dev_support_title">Von einem Indie-Entwickler erstellt</string>
+    <string name="paywall_title">Upgrade</string>
+    <string name="paywall_main_title">Upgrade auf Hazle Pro</string>
+    <string name="paywall_subtitle">Optimiere deinen Workflow mit unbegrenzten Nachrichten und Cloud-Synchronisierung.</string>
+    <string name="paywall_free_tier_title">Kostenlos</string>
+    <string name="paywall_free_tier_price">0 € / Monat</string>
+    <string name="paywall_free_tier_cta">Aktueller Plan</string>
+    <string name="paywall_pro_tier_title">Pro-Zugang</string>
+    <string name="paywall_pro_tier_price">4,99 € / Monat</string>
+    <string name="paywall_pro_tier_subtitle">oder 35,99 € / Jahr (40% Ersparnis)</string>
+    <string name="paywall_pro_tier_cta">Zu Pro wechseln</string>
+    <string name="paywall_byok_tier_title">VIP-Zugang / BYOK</string>
+    <string name="paywall_byok_tier_price">29,99 €</string>
+    <string name="paywall_byok_tier_subtitle">Einmalzahlung</string>
+    <string name="paywall_byok_tier_cta">Lebenslangen Zugriff freischalten</string>
+    <string name="paywall_recommended">Empfohlen</string>
+    <string name="paywall_feature_comparison_title">Feature-Vergleich</string>
+    <string name="paywall_feature_comparison_header_feature">Feature</string>
+    <string name="paywall_feature_comparison_header_free">Kostenlos</string>
+    <string name="paywall_feature_comparison_header_pro">Pro</string>
+    <string name="paywall_feature_comparison_header_byok">BYOK</string>
+    <string name="paywall_feature_ai_models">KI-Modelle</string>
+    <string name="paywall_feature_ai_models_free">GPT-4o mini</string>
+    <string name="paywall_feature_ai_models_pro">GPT-4o</string>
+    <string name="paywall_feature_ai_models_byok">Jedes OpenAI-Modell</string>
+    <string name="paywall_feature_daily_chats">Tägliche Chats</string>
+    <string name="paywall_feature_daily_chats_free">Begrenzt</string>
+    <string name="paywall_feature_daily_chats_pro">Unbegrenzt</string>
+    <string name="paywall_feature_daily_chats_byok">Unbegrenzt</string>
+    <string name="paywall_feature_cloud_sync">Cloud-Sync</string>
+    <string name="paywall_feature_cloud_sync_free">Nein (Lokal)</string>
+    <string name="paywall_feature_cloud_sync_pro">Ja</string>
+    <string name="paywall_feature_cloud_sync_byok">Ja</string>
+    <string name="paywall_feature_api_cost">API-Kosten</string>
+    <string name="paywall_feature_api_cost_free">Inklusive</string>
+    <string name="paywall_feature_api_cost_pro">Inklusive</string>
+    <string name="paywall_feature_api_cost_byok">Selbstzahler</string>
+    <string name="paywall_feature_updates">Updates</string>
+    <string name="paywall_feature_updates_free">Standard</string>
+    <string name="paywall_feature_updates_pro">Priorität</string>
+    <string name="paywall_feature_updates_byok">Priorität</string>
+    <string name="paywall_fine_print_subscription">Du kannst dein Abonnement jederzeit in den Google Play-Einstellungen verwalten oder kündigen.</string>
+    <string name="paywall_fine_print_byok">Wichtig: Der BYOK-Plan enthält kein KI-Guthaben. Du benötigst einen gültigen OpenAI API-Key. Die Nutzung wird dir direkt von OpenAI in Rechnung gestellt.</string>
+    <string name="paywall_free_feature_1">Vollständige Android-Systemintegration</string>
+    <string name="paywall_free_feature_2">Begrenztes tägliches Nachrichtenlimit</string>
+    <string name="paywall_free_feature_3">Chatverlauf nur lokal gespeichert</string>
+    <string name="paywall_free_feature_4">Keine Werbung oder Datensammlung</string>
+    <string name="paywall_pro_feature_1">Unbegrenzte Nachrichten</string>
+    <string name="paywall_pro_feature_2">Geräteübergreifender Cloud-Sync</string>
+    <string name="paywall_pro_feature_3">Frühzeitiger Zugriff auf neue Features</string>
+    <string name="paywall_byok_feature_1">Eigener OpenAI API-Key nutzbar</string>
+    <string name="paywall_byok_feature_2">Alle Pro-Features dauerhaft freigeschaltet</string>
+    <string name="paywall_byok_feature_3">Cloud-Sync inklusive</string>
+    <string name="paywall_byok_feature_4">Priorisierter Support für Feature-Anfragen</string>
 
 </resources>

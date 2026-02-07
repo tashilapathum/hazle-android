@@ -14,9 +14,11 @@ import com.tashila.hazle.features.chat.ChatViewModel
 import com.tashila.hazle.ui.navigation.AppDestinations.ONBOARDING_ROUTE
 import com.tashila.hazle.ui.navigation.AppDestinations.SETTINGS_ROUTE
 import com.tashila.hazle.ui.navigation.AppDestinations.THREADS_ROUTE
+import com.tashila.hazle.ui.navigation.AppDestinations.UPGRADE_ROUTE
 import com.tashila.hazle.ui.navigation.AppDestinations.chatDetailRoute
 import com.tashila.hazle.ui.screens.ChatScreen
 import com.tashila.hazle.ui.screens.OnboardingScreen
+import com.tashila.hazle.ui.screens.PaywallScreen
 import com.tashila.hazle.ui.screens.SettingsScreen
 import com.tashila.hazle.ui.screens.ThreadsScreen
 import org.koin.androidx.compose.koinViewModel
@@ -85,6 +87,16 @@ fun MainNavHost(
         }
         composable(SETTINGS_ROUTE) {
             SettingsScreen(
+                onUpgradeClicked = {
+                    navController.navigate(UPGRADE_ROUTE)
+                },
+                onBackClicked = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(UPGRADE_ROUTE) {
+            PaywallScreen(
                 onBackClicked = {
                     navController.popBackStack()
                 }
