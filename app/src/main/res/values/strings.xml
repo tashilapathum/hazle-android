@@ -68,8 +68,6 @@
     <string name="language_german">German</string>
     <string name="language_sinhala">Sinhala</string>
 
-    <string name="api_endpoint_title">API Endpoint</string>
-    <string name="api_endpoint_description">Set the API Endpoint if you\'re self-hosting. Default is https://api.hazle.tashila.me/</string>
     <string name="openai_api_key_title">OpenAI API Key</string>
     <string name="openai_api_key_description">Set your OpenAI API Key for custom model usage.</string>
     <string name="openai_api_key_dialog_title">Set OpenAI API Key</string>

@@ -34,7 +34,6 @@ class SettingsViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         // Mock repository calls before initializing the ViewModel
-        coEvery { mockSettingsRepository.getApiUrl() } returns flowOf("https://api.example.com")
         coEvery { mockSettingsRepository.getUserInfo() } returns flowOf(UserInfo("user", "user@example.com"))
         coEvery { mockSettingsRepository.getLocale() } returns flowOf(Locale.ENGLISH.language)
 
@@ -45,22 +44,6 @@ class SettingsViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-    }
-
-    @Test
-    fun `onSaveApiUrlClicked should save the url and show success message`() = runTest {
-        // Given
-        val newUrl = "https://new-api.example.com"
-        viewModel.onApiUrlInputChanged(newUrl)
-
-        // When
-        viewModel.onSaveApiUrlClicked()
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        // Then
-        coVerify { mockSettingsRepository.saveApiUrl(newUrl) }
-        assertEquals("API URL saved", viewModel.message.value)
-        assertFalse(viewModel.isLoading.value)
     }
 
     @Test

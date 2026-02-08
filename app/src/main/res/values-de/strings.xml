@@ -68,8 +68,6 @@
     <string name="language_german">Deutsch</string>
     <string name="language_sinhala">Singhalesisch</string>
 
-    <string name="api_endpoint_title">API-Endpunkt</string>
-    <string name="api_endpoint_description">Lege den API-Endpunkt fest, wenn du selbst hostest. Standard ist https://api.hazle.tashila.me/</string>
     <string name="openai_api_key_title">OpenAI API-Schlüssel</string>
     <string name="openai_api_key_description">Lege deinen OpenAI API-Schlüssel für die Nutzung benutzerdefinierter Modelle fest.</string>
     <string name="openai_api_key_dialog_title">OpenAI API-Schlüssel festlegen</string>

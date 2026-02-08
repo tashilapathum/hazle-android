@@ -16,7 +16,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -41,13 +40,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.tashila.hazle.R
 import com.tashila.hazle.features.settings.SettingsViewModel
 import com.tashila.hazle.ui.activities.LoginActivity
 import com.tashila.hazle.ui.components.dialogs.ConfirmationDialog
 import com.tashila.hazle.ui.components.settings.AccountInfoSection
-import com.tashila.hazle.ui.components.settings.ApiUrlSettingDialog
 import com.tashila.hazle.ui.components.settings.OpenAIApiKeyDialog
 import com.tashila.hazle.ui.components.settings.SelectLanguageDialog
 import com.tashila.hazle.ui.components.settings.SettingsItem
@@ -64,14 +63,12 @@ fun SettingsScreen(
     val context = LocalContext.current
 
     // Collect states from the ViewModel
-    val apiUrlInput by viewModel.apiUrlInput.collectAsState()
     val userInfo by viewModel.userInfo.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val message by viewModel.message.collectAsState()
     val language by viewModel.selectedLocale.collectAsState()
 
     // State for managing the visibility of dialogs
-    var showApiUrlDialog by remember { mutableStateOf(false) }
     var showConfirmLogoutDialog by remember { mutableStateOf(false) }
     var showOpenAIApiKeyDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
@@ -200,18 +197,21 @@ fun SettingsScreen(
             }
             item {
                 SettingsItem(
-                    icon = Icons.Outlined.Link,
-                    title = stringResource(id = R.string.api_endpoint_title),
-                    description = stringResource(id = R.string.api_endpoint_description),
-                    onClick = { showApiUrlDialog = true }
-                )
-            }
-            item {
-                SettingsItem(
                     icon = Icons.Outlined.Key,
                     title = stringResource(id = R.string.openai_api_key_title),
                     description = stringResource(id = R.string.openai_api_key_description),
                     onClick = { showOpenAIApiKeyDialog = true }
+                )
+            }
+            item {
+                Text(
+                    text = "Developed by Tashila Pathum with ❤️ from  🇱🇰",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp, bottom = 16.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -224,19 +224,6 @@ fun SettingsScreen(
                 viewModel.onLanguageClicked(localeTag)
                 showLanguageDialog = false
             }
-        )
-    }
-
-    if (showApiUrlDialog) {
-        ApiUrlSettingDialog(
-            currentApiUrl = apiUrlInput,
-            onApiUrlChanged = viewModel::onApiUrlInputChanged,
-            onSaveClicked = {
-                viewModel.onSaveApiUrlClicked()
-                showApiUrlDialog = false
-            },
-            onDismiss = { showApiUrlDialog = false },
-            isSaving = isLoading
         )
     }
 
