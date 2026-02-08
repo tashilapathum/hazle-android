@@ -24,7 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -46,6 +49,7 @@ fun PaywallScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val pagerState = rememberPagerState(initialPage = 1) { 3 }
+    var showPaywall by remember { mutableStateOf(true) }
 
     val plans = remember {
         listOf(
@@ -177,6 +181,10 @@ fun PaywallScreen(
                     )
                 }
             }
+        }
+
+        if (showPaywall) {
+
         }
     }
 }

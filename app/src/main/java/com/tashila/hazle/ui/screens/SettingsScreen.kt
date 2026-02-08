@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,6 +68,7 @@ fun SettingsScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val message by viewModel.message.collectAsState()
     val language by viewModel.selectedLocale.collectAsState()
+    val isSubscribed by viewModel.isSubscribed.collectAsState()
 
     // State for managing the visibility of dialogs
     var showConfirmLogoutDialog by remember { mutableStateOf(false) }
@@ -118,7 +120,13 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                UpgradeCard(onClicked = { onUpgradeClicked.invoke() })
+                if (isSubscribed) {
+                    Button(onClick = {  }) {
+                        Text(text = "Manage Subscription")
+                    }
+                } else {
+                    UpgradeCard(onClicked = { onUpgradeClicked.invoke() })
+                }
             }
 
             // Account info

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.auth.UserInfo
+import com.tashila.hazle.features.subscription.SubscriptionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,8 @@ import java.util.Locale
 class SettingsViewModel(
     // Koin will inject this dependency automatically
     private val repository: SettingsRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val subscriptionManager: SubscriptionManager
 ) : ViewModel() {
 
     // State for user information
@@ -35,6 +37,8 @@ class SettingsViewModel(
     // State locale tag
     private val _selectedLocale = MutableStateFlow(Locale.getDefault().language)
     val selectedLocale: StateFlow<String> = _selectedLocale.asStateFlow()
+
+    val isSubscribed = subscriptionManager.isSubscribed
 
     init {
         // Collect user info from repository

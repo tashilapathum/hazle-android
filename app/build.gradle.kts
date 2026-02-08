@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +8,13 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.sentry)
+}
+
+val localProperties = Properties()
+try {
+    localProperties.load(FileInputStream(rootProject.file("local.properties")))
+} catch (e: Exception) {
+    // Ignore
 }
 
 android {
@@ -19,6 +29,7 @@ android {
         versionName = "0.1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "REVENUECAT_API_KEY", "\"${localProperties.getProperty("revenuecat.api.key")}\"")
     }
 
     buildTypes {
@@ -86,6 +97,9 @@ dependencies {
     // Data
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.datastore.preferences)
+
+    // RevenueCat
+    implementation(libs.revenuecat.purchases)
 
     // Testing
     testImplementation(libs.junit)
