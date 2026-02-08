@@ -17,6 +17,7 @@ object AppDestinations {
     const val THREADS_ROUTE = "threads"
     const val SETTINGS_ROUTE = "settings"
     const val ONBOARDING_ROUTE = "onboarding"
+    const val UPGRADE_ROUTE = "upgrade"
 
     /*----------------------------- Chats -----------------------------*/
 

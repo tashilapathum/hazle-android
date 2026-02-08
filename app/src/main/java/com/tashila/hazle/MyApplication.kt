@@ -64,19 +64,15 @@ class MyApplication : Application(), LifecycleObserver {
     }
 
     private fun initializeSentry() {
+        if (BuildConfig.DEBUG) return
+
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             options.dsn = "https://d5f49007f580761e93cb6132149c7aeb@o4509654455418880.ingest.de.sentry.io/4509654457253968"
             options.isEnableUserInteractionBreadcrumbs = true
             options.isEnableUserInteractionTracing = true
-
-            // Disable screenshot attachment on crash
             options.isEnableScreenTracking = false
-
-            // Set performance tracing sample rate
             options.tracesSampleRate = 0.25
-
-            // Set env
-            options.environment = if (BuildConfig.DEBUG) "development" else "production";
+            options.environment = "production"
         }
     }
 

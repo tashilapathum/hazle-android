@@ -23,7 +23,6 @@ class SettingsRepositoryImpl(private val dataStore: DataStore<Preferences>) : Se
 
     // Preference key for storing the API URL
     private object PreferencesKeys {
-        val API_URL = stringPreferencesKey("api_url")
         val USER_INFO = stringPreferencesKey("user_info")
         val ONBOARD_DONE = booleanPreferencesKey("onboard_done")
         val LOCALE_TAG = stringPreferencesKey("locale_tag")
@@ -64,27 +63,8 @@ class SettingsRepositoryImpl(private val dataStore: DataStore<Preferences>) : Se
             }
     }
 
-    /**
-     * Saves the API URL to DataStore.
-     */
-    override suspend fun saveApiUrl(url: String) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.API_URL] = url
-        }
-    }
-
-    /**
-     * Retrieves the API URL from DataStore as a Flow.
-     */
-    override fun getApiUrl(): Flow<String> {
-        return dataStore.data
-            .map { preferences ->
-                preferences[PreferencesKeys.API_URL] ?: SERVER_URL
-            }
-    }
-
     override fun getBaseUrl(): String {
-        return runBlocking { getApiUrl().first() }
+        return SERVER_URL
     }
 
     override suspend fun saveOnboardState(isDone: Boolean) {

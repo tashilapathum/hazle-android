@@ -11,7 +11,6 @@ import com.tashila.hazle.features.auth.SupabaseAuthResponse
 import com.tashila.hazle.features.auth.SupabaseUser
 import com.tashila.hazle.features.settings.SettingsRepository
 import com.tashila.hazle.features.settings.SettingsRepositoryImpl
-import com.tashila.hazle.utils.SERVER_URL
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -49,28 +48,6 @@ class SettingsRepositoryImplTest {
     @After
     fun tearDown() {
         File(context.filesDir, "datastore/test_settings.preferences_pb").delete()
-    }
-
-    @Test
-    fun saveApiUrl_and_getApiUrl() = testScope.runTest {
-        // Given
-        val customUrl = "http://192.168.1.100:8080"
-
-        // When
-        settingsRepository.saveApiUrl(customUrl)
-
-        // Then
-        val savedUrl = settingsRepository.getApiUrl().first()
-        assertEquals(customUrl, savedUrl)
-    }
-
-    @Test
-    fun getApiUrl_returnsDefaultUrl_whenNotSet() = testScope.runTest {
-        // When
-        val savedUrl = settingsRepository.getApiUrl().first()
-
-        // Then
-        assertEquals(SERVER_URL, savedUrl)
     }
 
     @Test
@@ -143,16 +120,13 @@ class SettingsRepositoryImplTest {
     @Test
     fun logout_clearsData() = testScope.runTest {
         // Given
-        settingsRepository.saveApiUrl("http://some.url")
         settingsRepository.saveOnboardState(true)
 
         // When
         settingsRepository.logout()
 
         // Then
-        val savedUrl = settingsRepository.getApiUrl().first()
         val onboarded = settingsRepository.isOnboarded()
-        assertEquals(SERVER_URL, savedUrl)
         assertFalse(onboarded)
     }
 }

@@ -68,8 +68,6 @@
     <string name="language_german">ජර්මන්</string>
     <string name="language_sinhala">සිංහල</string>
 
-    <string name="api_endpoint_title">API Endpoint</string>
-    <string name="api_endpoint_description">Set the API Endpoint if you\'re self-hosting. Default is https://api.hazle.tashila.me/</string>
     <string name="openai_api_key_title">OpenAI API Key</string>
     <string name="openai_api_key_description">Set your OpenAI API Key for custom model usage.</string>
     <string name="openai_api_key_dialog_title">Set OpenAI API Key</string>
@@ -78,7 +76,67 @@
     <string name="notification_settings_description">ඇප් දැනුම්දීම් කළමනාකරණය කරන්න</string>
     <string name="about_title">ගැන</string>
     <string name="about_description_version">අනුවාදය %s</string>
-
     <string name="advanced_settings_section_title">Advanced</string>
+
+    <!-- Paywall Screen -->
+
+    <string name="upgrade_to_pro_title">නොමිලේ භාවිතා කරන්නා</string>
+    <string name="unlock_all_features">ඔබ දැනට භාවිතා කරන්නේ නොමිලේ ලබා දෙන සේවාවයි. Hazle Pro සමඟින් අපරිමිත පණිවුඩ, දියුණු AI මාදිලි සහ ඔබේම API කේතයක් භාවිතා කිරීමේ හැකියාව ලබා ගන්න.</string>
+    <string name="pro_badge">Pro ලබා ගන්න</string>
+    <string name="developer_support_note">මෙම යෙදුම AI මෙවලම් වඩාත් විනිවිදභාවයකින් යුතුව සැමට ලබා දීම සඳහා තනි පුද්ගල ව්‍යාපෘතියක් ලෙස නිර්මාණය කරන ලද්දකි. ඔබේ දායකත්වය මෙහි ඉදිරි දියුණුවට සහ පැවැත්මට සෘජුවම උපකාරී වේ. ඔබට ස්තූතියි!\n\n🌱</string>
+    <string name="dev_support_title">ස්වාධීන නිර්මාණකරුවෙකුගේ නිපැයුමකි</string>
+    <string name="paywall_title">යාවත්කාලීන කරන්න</string>
+    <string name="paywall_main_title">Hazle Pro වෙත යාවත්කාලීන වන්න</string>
+    <string name="paywall_subtitle">අපරිමිත පණිවුඩ හුවමාරුව සහ Cloud Sync සමඟින් ඔබේ වැඩකටයුතු වඩාත් කාර්යක්ෂම කරගන්න.</string>
+    <string name="paywall_free_tier_title">නොමිලේ</string>
+    <string name="paywall_free_tier_price">නොමිලේ</string>
+    <string name="paywall_free_tier_cta">වත්මන් සැලසුම</string>
+    <string name="paywall_pro_tier_title">Pro සේවාව</string>
+    <string name="paywall_pro_tier_price">මසකට රු. 1,490</string>
+    <string name="paywall_pro_tier_subtitle">නැතහොත් වසරකට රු. 10,900 (40% ක ඉතිරියක්)</string>
+    <string name="paywall_pro_tier_cta">Pro වෙත මාරු වන්න</string>
+    <string name="paywall_byok_tier_title">VIP ප්‍රවේශය / BYOK</string>
+    <string name="paywall_byok_tier_price">රු. 8,900</string>
+    <string name="paywall_byok_tier_subtitle">එක් වරක් පමණක් ගෙවන මුදලකි</string>
+    <string name="paywall_byok_tier_cta">ජීවිත කාලයටම ලබා ගන්න</string>
+    <string name="paywall_recommended">නිර්දේශිතයි</string>
+    <string name="paywall_feature_comparison_title">විශේෂාංග සැසඳීම</string>
+    <string name="paywall_feature_comparison_header_feature">විශේෂාංගය</string>
+    <string name="paywall_feature_comparison_header_free">නොමිලේ</string>
+    <string name="paywall_feature_comparison_header_pro">Pro</string>
+    <string name="paywall_feature_comparison_header_byok">BYOK</string>
+    <string name="paywall_feature_ai_models">AI මාදිලි</string>
+    <string name="paywall_feature_ai_models_free">GPT-4o mini</string>
+    <string name="paywall_feature_ai_models_pro">GPT-4o</string>
+    <string name="paywall_feature_ai_models_byok">ඕනෑම OpenAI මාදිලියක්</string>
+    <string name="paywall_feature_daily_chats">දෛනික සංවාද</string>
+    <string name="paywall_feature_daily_chats_free">සීමිතයි</string>
+    <string name="paywall_feature_daily_chats_pro">අපරිමිතයි</string>
+    <string name="paywall_feature_daily_chats_byok">අපරිමිතයි</string>
+    <string name="paywall_feature_cloud_sync">Cloud Sync</string>
+    <string name="paywall_feature_cloud_sync_free">නැත (Local)</string>
+    <string name="paywall_feature_cloud_sync_pro">ඔව්</string>
+    <string name="paywall_feature_cloud_sync_byok">ඔව්</string>
+    <string name="paywall_feature_api_cost">API පිරිවැය</string>
+    <string name="paywall_feature_api_cost_free">ඇතුළත් කර ඇත</string>
+    <string name="paywall_feature_api_cost_pro">ඇතුළත් කර ඇත</string>
+    <string name="paywall_feature_api_cost_byok">ඔබ විසින් ගෙවිය යුතුය</string>
+    <string name="paywall_feature_updates">යාවත්කාලීනයන්</string>
+    <string name="paywall_feature_updates_free">සාමාන්‍ය</string>
+    <string name="paywall_feature_updates_pro">ප්‍රමුඛතාව</string>
+    <string name="paywall_feature_updates_byok">ප්‍රමුඛතාව</string>
+    <string name="paywall_fine_print_subscription">ඔබගේ දායකත්වය ඕනෑම වේලාවක Google Play සැකසුම් හරහා කළමනාකරණය කිරීමට හෝ අවලංගු කිරීමට හැකිය.</string>
+    <string name="paywall_fine_print_byok">වැදගත්: BYOK සැලසුමට AI ක්‍රෙඩිට් ඇතුළත් නොවේ. පණිවුඩ යැවීම සඳහා ඔබ සතුව වලංගු OpenAI Platform API කේතයක් තිබිය යුතුය. ඔබේ භාවිතය සඳහා OpenAI වෙත සෘජුවම ගෙවීම් කළ යුතුය.</string>
+    <string name="paywall_free_feature_1">සම්පූර්ණ Android පද්ධති ඒකාබද්ධතාවය</string>
+    <string name="paywall_free_feature_2">දෛනික පණිවුඩ සීමාවක් පවතී</string>
+    <string name="paywall_free_feature_3">සංවාද ඉතිහාසය ඔබගේ දුරකථනයේ පමණක් සුරැකේ</string>
+    <string name="paywall_free_feature_4">දැන්වීම් හෝ දත්ත එකතු කිරීම් නොමැත</string>
+    <string name="paywall_pro_feature_1">අපරිමිත පණිවුඩ සංඛ්‍යාවක්</string>
+    <string name="paywall_pro_feature_2">සියලුම උපාංග අතර Cloud Sync</string>
+    <string name="paywall_pro_feature_3">නව විශේෂාංග සඳහා මුල් ප්‍රවේශය</string>
+    <string name="paywall_byok_feature_1">ඔබේම OpenAI API කේතය භාවිතා කරන්න</string>
+    <string name="paywall_byok_feature_2">සියලුම Pro විශේෂාංග ජීවිත කාලයටම ලබා ගන්න</string>
+    <string name="paywall_byok_feature_3">Cloud සමමුහුර්තකරණය ඇතුළත් වේ</string>
+    <string name="paywall_byok_feature_4">ප්‍රමුඛතා පාරිභෝගික සහාය</string>
 
 </resources>

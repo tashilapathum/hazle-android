@@ -20,10 +20,6 @@ class SettingsViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    // State for the API URL text field
-    private val _apiUrlInput = MutableStateFlow("")
-    val apiUrlInput: StateFlow<String> = _apiUrlInput.asStateFlow()
-
     // State for user information
     private val _userInfo = MutableStateFlow(UserInfo("", ""))
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()
@@ -41,10 +37,6 @@ class SettingsViewModel(
     val selectedLocale: StateFlow<String> = _selectedLocale.asStateFlow()
 
     init {
-        // Collect API URL from repository when ViewModel is initialized
-        viewModelScope.launch {
-            repository.getApiUrl().collect { _apiUrlInput.value = it }
-        }
         // Collect user info from repository
         viewModelScope.launch {
             repository.getUserInfo().collect { _userInfo.value = it }
@@ -52,33 +44,6 @@ class SettingsViewModel(
         // Collect Locale
         viewModelScope.launch {
             repository.getLocale().collect { _selectedLocale.value = it }
-        }
-    }
-
-    /**
-     * Updates the API URL input field value.
-     * @param url The new URL string from the text field.
-     */
-    fun onApiUrlInputChanged(url: String) {
-        _apiUrlInput.value = url
-    }
-
-    /**
-     * Handles the save API URL action.
-     * Calls the repository to persist the new API URL.
-     */
-    fun onSaveApiUrlClicked() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _message.value = null // Clear previous messages
-            try {
-                repository.saveApiUrl(_apiUrlInput.value)
-                _message.value = "API URL saved"
-            } catch (e: Exception) {
-                _message.value = "Failed to save API URL: ${e.localizedMessage}"
-            } finally {
-                _isLoading.value = false
-            }
         }
     }
 

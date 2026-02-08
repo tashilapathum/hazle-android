@@ -12,7 +12,9 @@ import com.tashila.hazle.db.threads.ThreadDao
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.auth.TokenRepository
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -45,13 +47,9 @@ fun provideDataStore(context: Context): DataStore<Preferences> {
 // Dedicated HttpClient for Auth calls (without Auth plugin to avoid circular dependencies)
 fun provideHttpClient(): HttpClient {
     return HttpClient(Android) {
-        install(ContentNegotiation) {
-            json(provideJsonDecoder())
-        }
-        install(Logging) {
-            logger = Logger.ANDROID
-            level = LogLevel.ALL
-        }
+        installRetry()
+        installContentNegotiation()
+        installLogging()
     }
 }
 
@@ -61,54 +59,89 @@ fun provideAuthenticatedHttpClient(
     authRepository: AuthRepository
 ): HttpClient {
     return HttpClient(Android) {
-        install(ContentNegotiation) {
-            json(provideJsonDecoder())
-        }
-        install(Logging) {
-            logger = Logger.ANDROID
-            level = LogLevel.ALL
+        installRetry()
+        installContentNegotiation()
+        installLogging()
+        installAuth(tokenRepository, authRepository)
+    }
+}
+
+private fun HttpClientConfig<*>.installRetry() {
+    install(HttpRequestRetry) {
+        maxRetries = 5
+        // Retry on 5xx errors during cold start
+        retryOnServerErrors(maxRetries)
+        // Retry on connection exceptions
+        retryOnExceptionIf { _, cause ->
+            cause is java.net.ConnectException || cause is java.net.SocketTimeoutException
         }
 
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    val accessToken = tokenRepository.getAccessToken()
-                    val refreshToken = tokenRepository.getRefreshToken()
-                    if (accessToken != null && refreshToken != null) {
-                        BearerTokens(accessToken, refreshToken)
-                    } else {
-                        null
-                    }
+        // Wait 2s, then 4s, 8s, etc. (with jitter)
+        exponentialDelay(
+            base = 2.0,
+            baseDelayMs = 2000,
+            maxDelayMs = 15000,
+            randomizationMs = 500
+        )
+    }
+}
+
+private fun HttpClientConfig<*>.installContentNegotiation() {
+    install(ContentNegotiation) {
+        json(provideJsonDecoder())
+    }
+}
+
+private fun HttpClientConfig<*>.installLogging() {
+    install(Logging) {
+        logger = Logger.ANDROID
+        level = LogLevel.ALL
+    }
+}
+
+private fun HttpClientConfig<*>.installAuth(
+    tokenRepository: TokenRepository,
+    authRepository: AuthRepository
+) {
+    install(Auth) {
+        bearer {
+            loadTokens {
+                val accessToken = tokenRepository.getAccessToken()
+                val refreshToken = tokenRepository.getRefreshToken()
+                if (accessToken != null && refreshToken != null) {
+                    BearerTokens(accessToken, refreshToken)
+                } else {
+                    null
                 }
-                refreshTokens {
-                    val currentRefreshToken = tokenRepository.getRefreshToken()
+            }
+            refreshTokens {
+                val currentRefreshToken = tokenRepository.getRefreshToken()
 
-                    if (currentRefreshToken != null) {
-                        val success = try {
-                            authRepository.refresh(currentRefreshToken)
-                        } catch (e: Exception) {
-                            false
-                        }
+                if (currentRefreshToken != null) {
+                    val success = try {
+                        authRepository.refresh(currentRefreshToken)
+                    } catch (e: Exception) {
+                        false
+                    }
 
-                        if (success) {
-                            val newAccessToken = tokenRepository.getAccessToken()
-                            val newRefreshToken = tokenRepository.getRefreshToken()
+                    if (success) {
+                        val newAccessToken = tokenRepository.getAccessToken()
+                        val newRefreshToken = tokenRepository.getRefreshToken()
 
-                            if (newAccessToken != null && newRefreshToken != null) {
-                                BearerTokens(newAccessToken, newRefreshToken)
-                            } else {
-                                null
-                            }
+                        if (newAccessToken != null && newRefreshToken != null) {
+                            BearerTokens(newAccessToken, newRefreshToken)
                         } else {
-                            tokenRepository.clearTokens()
                             null
                         }
                     } else {
+                        tokenRepository.clearTokens()
                         null
                     }
+                } else {
+                    null
                 }
-
             }
+
         }
     }
 }
