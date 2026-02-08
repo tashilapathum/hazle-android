@@ -7,6 +7,9 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.revenuecat.purchases.LogLevel
+import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.PurchasesConfiguration
 import com.tashila.hazle.di.appModule
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
@@ -25,6 +28,7 @@ class MyApplication : Application(), LifecycleObserver {
         addLifeCycleObserver()
         createNotificationChannel()
         initializeSentry()
+        initializeRevenueCat()
     }
 
     private fun addLifeCycleObserver() {
@@ -73,6 +77,18 @@ class MyApplication : Application(), LifecycleObserver {
             options.isEnableScreenTracking = false
             options.tracesSampleRate = 0.25
             options.environment = "production"
+        }
+    }
+
+    private fun initializeRevenueCat() {
+        class MainApplication: Application() {
+            override fun onCreate() {
+                super.onCreate()
+                Purchases.logLevel = LogLevel.DEBUG
+                Purchases.configure(
+                    PurchasesConfiguration.Builder(this, "test_jekfJzauYRHSbyCUDcqlQYpnXqi")
+                    .build())
+            }
         }
     }
 

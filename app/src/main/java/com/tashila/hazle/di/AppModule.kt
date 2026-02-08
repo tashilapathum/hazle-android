@@ -12,9 +12,11 @@ import com.tashila.hazle.features.auth.TokenRepositoryImpl
 import com.tashila.hazle.features.chat.ChatRepository
 import com.tashila.hazle.features.chat.ChatRepositoryImpl
 import com.tashila.hazle.features.chat.ChatViewModel
+import com.tashila.hazle.features.paywall.PaywallViewModel
 import com.tashila.hazle.features.settings.SettingsRepository
 import com.tashila.hazle.features.settings.SettingsRepositoryImpl
 import com.tashila.hazle.features.settings.SettingsViewModel
+import com.tashila.hazle.features.subscription.SubscriptionManager
 import com.tashila.hazle.features.thread.ThreadRepository
 import com.tashila.hazle.features.thread.ThreadRepositoryImpl
 import com.tashila.hazle.features.thread.ThreadsViewModel
@@ -25,6 +27,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val appModule = module {
+    includes(revenueCatModule)
+
     // --- HttpClient Providers ---
     single { provideJsonDecoder() }
     single(named("AuthHttpClient")) { provideHttpClient() } // Dedicated HttpClient for Auth calls (NO Auth plugin)
@@ -55,6 +59,7 @@ val appModule = module {
     ) }
     single<ThreadRepository> { ThreadRepositoryImpl(get()) }
     single<SettingsRepository> { SettingsRepositoryImpl(get()) }
+    single { SubscriptionManager(get()) }
 
     // --- Context-dependant Providers ---
     single { provideClock() }
@@ -69,5 +74,6 @@ val appModule = module {
     viewModel { AuthViewModel(get()) }
     viewModel { ThreadsViewModel(get()) }
     viewModel { ChatViewModel(get(), get(), get()) }
-    viewModel { SettingsViewModel(get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get()) }
+    viewModel { PaywallViewModel(get()) }
 }

@@ -4,6 +4,7 @@ import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.auth.UserInfo
 import com.tashila.hazle.features.settings.SettingsRepository
 import com.tashila.hazle.features.settings.SettingsViewModel
+import com.tashila.hazle.features.subscription.SubscriptionManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -27,6 +28,7 @@ class SettingsViewModelTest {
     private lateinit var viewModel: SettingsViewModel
     private val mockSettingsRepository: SettingsRepository = mockk(relaxed = true)
     private val mockAuthRepository: AuthRepository = mockk(relaxed = true)
+    private val mockSubscriptionManager: SubscriptionManager = mockk(relaxed = true)
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
@@ -37,7 +39,7 @@ class SettingsViewModelTest {
         coEvery { mockSettingsRepository.getUserInfo() } returns flowOf(UserInfo("user", "user@example.com"))
         coEvery { mockSettingsRepository.getLocale() } returns flowOf(Locale.ENGLISH.language)
 
-        viewModel = SettingsViewModel(mockSettingsRepository, mockAuthRepository)
+        viewModel = SettingsViewModel(mockSettingsRepository, mockAuthRepository, mockSubscriptionManager)
         testDispatcher.scheduler.advanceUntilIdle() // Run init block
     }
 

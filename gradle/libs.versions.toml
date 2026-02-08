@@ -27,6 +27,7 @@ foundation = "1.10.2"
 sentry = "6.0.0"
 coil = "2.7.0"
 turbine = "1.2.1"
+revenuecat-purchases = "9.20.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -77,6 +78,7 @@ kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime",
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+revenuecat-purchases = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecat-purchases" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
