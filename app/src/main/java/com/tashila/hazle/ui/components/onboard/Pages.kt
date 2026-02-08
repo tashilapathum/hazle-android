@@ -1,4 +1,4 @@
-package com.tashila.hazle.features.onboard
+package com.tashila.hazle.ui.components.onboard
 
 import androidx.compose.ui.graphics.Color
 import com.tashila.hazle.R

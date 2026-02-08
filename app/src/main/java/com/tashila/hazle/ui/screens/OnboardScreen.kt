@@ -49,8 +49,8 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.tashila.hazle.R
-import com.tashila.hazle.features.onboard.PageContent
-import com.tashila.hazle.features.onboard.pages
+import com.tashila.hazle.ui.components.onboard.PageContent
+import com.tashila.hazle.ui.components.onboard.pages
 import com.tashila.hazle.ui.components.onboard.AnimatedWhisperText
 import com.tashila.hazle.ui.components.onboard.BubblePager
 import com.tashila.hazle.ui.components.onboard.shimmerEffect

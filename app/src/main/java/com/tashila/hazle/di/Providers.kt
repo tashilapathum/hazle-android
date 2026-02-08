@@ -48,13 +48,8 @@ fun provideDataStore(context: Context): DataStore<Preferences> {
 fun provideHttpClient(): HttpClient {
     return HttpClient(Android) {
         installRetry()
-        install(ContentNegotiation) {
-            json(provideJsonDecoder())
-        }
-        install(Logging) {
-            logger = Logger.ANDROID
-            level = LogLevel.ALL
-        }
+        installContentNegotiation()
+        installLogging()
     }
 }
 
@@ -65,55 +60,9 @@ fun provideAuthenticatedHttpClient(
 ): HttpClient {
     return HttpClient(Android) {
         installRetry()
-        install(ContentNegotiation) {
-            json(provideJsonDecoder())
-        }
-        install(Logging) {
-            logger = Logger.ANDROID
-            level = LogLevel.ALL
-        }
-
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    val accessToken = tokenRepository.getAccessToken()
-                    val refreshToken = tokenRepository.getRefreshToken()
-                    if (accessToken != null && refreshToken != null) {
-                        BearerTokens(accessToken, refreshToken)
-                    } else {
-                        null
-                    }
-                }
-                refreshTokens {
-                    val currentRefreshToken = tokenRepository.getRefreshToken()
-
-                    if (currentRefreshToken != null) {
-                        val success = try {
-                            authRepository.refresh(currentRefreshToken)
-                        } catch (e: Exception) {
-                            false
-                        }
-
-                        if (success) {
-                            val newAccessToken = tokenRepository.getAccessToken()
-                            val newRefreshToken = tokenRepository.getRefreshToken()
-
-                            if (newAccessToken != null && newRefreshToken != null) {
-                                BearerTokens(newAccessToken, newRefreshToken)
-                            } else {
-                                null
-                            }
-                        } else {
-                            tokenRepository.clearTokens()
-                            null
-                        }
-                    } else {
-                        null
-                    }
-                }
-
-            }
-        }
+        installContentNegotiation()
+        installLogging()
+        installAuth(tokenRepository, authRepository)
     }
 }
 
@@ -134,6 +83,66 @@ private fun HttpClientConfig<*>.installRetry() {
             maxDelayMs = 15000,
             randomizationMs = 500
         )
+    }
+}
+
+private fun HttpClientConfig<*>.installContentNegotiation() {
+    install(ContentNegotiation) {
+        json(provideJsonDecoder())
+    }
+}
+
+private fun HttpClientConfig<*>.installLogging() {
+    install(Logging) {
+        logger = Logger.ANDROID
+        level = LogLevel.ALL
+    }
+}
+
+private fun HttpClientConfig<*>.installAuth(
+    tokenRepository: TokenRepository,
+    authRepository: AuthRepository
+) {
+    install(Auth) {
+        bearer {
+            loadTokens {
+                val accessToken = tokenRepository.getAccessToken()
+                val refreshToken = tokenRepository.getRefreshToken()
+                if (accessToken != null && refreshToken != null) {
+                    BearerTokens(accessToken, refreshToken)
+                } else {
+                    null
+                }
+            }
+            refreshTokens {
+                val currentRefreshToken = tokenRepository.getRefreshToken()
+
+                if (currentRefreshToken != null) {
+                    val success = try {
+                        authRepository.refresh(currentRefreshToken)
+                    } catch (e: Exception) {
+                        false
+                    }
+
+                    if (success) {
+                        val newAccessToken = tokenRepository.getAccessToken()
+                        val newRefreshToken = tokenRepository.getRefreshToken()
+
+                        if (newAccessToken != null && newRefreshToken != null) {
+                            BearerTokens(newAccessToken, newRefreshToken)
+                        } else {
+                            null
+                        }
+                    } else {
+                        tokenRepository.clearTokens()
+                        null
+                    }
+                } else {
+                    null
+                }
+            }
+
+        }
     }
 }
 
