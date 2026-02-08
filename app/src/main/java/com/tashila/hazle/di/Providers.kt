@@ -12,7 +12,9 @@ import com.tashila.hazle.db.threads.ThreadDao
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.auth.TokenRepository
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -45,6 +47,7 @@ fun provideDataStore(context: Context): DataStore<Preferences> {
 // Dedicated HttpClient for Auth calls (without Auth plugin to avoid circular dependencies)
 fun provideHttpClient(): HttpClient {
     return HttpClient(Android) {
+        installRetry()
         install(ContentNegotiation) {
             json(provideJsonDecoder())
         }
@@ -61,6 +64,7 @@ fun provideAuthenticatedHttpClient(
     authRepository: AuthRepository
 ): HttpClient {
     return HttpClient(Android) {
+        installRetry()
         install(ContentNegotiation) {
             json(provideJsonDecoder())
         }
@@ -110,6 +114,26 @@ fun provideAuthenticatedHttpClient(
 
             }
         }
+    }
+}
+
+private fun HttpClientConfig<*>.installRetry() {
+    install(HttpRequestRetry) {
+        maxRetries = 5
+        // Retry on 5xx errors during cold start
+        retryOnServerErrors(maxRetries)
+        // Retry on connection exceptions
+        retryOnExceptionIf { _, cause ->
+            cause is java.net.ConnectException || cause is java.net.SocketTimeoutException
+        }
+
+        // Wait 2s, then 4s, 8s, etc. (with jitter)
+        exponentialDelay(
+            base = 2.0,
+            baseDelayMs = 2000,
+            maxDelayMs = 15000,
+            randomizationMs = 500
+        )
     }
 }
 
