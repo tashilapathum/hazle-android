@@ -25,8 +25,8 @@ android {
         applicationId = "com.tashila.hazle"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "0.1.7"
+        versionCode = 10
+        versionName = "0.1.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "REVENUECAT_API_KEY", "\"${localProperties.getProperty("revenuecat.api.key")}\"")
