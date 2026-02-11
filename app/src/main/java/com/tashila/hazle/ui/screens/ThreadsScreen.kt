@@ -27,6 +27,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,7 +38,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tashila.hazle.R
+import com.tashila.hazle.db.threads.ThreadEntity
 import com.tashila.hazle.features.thread.ThreadsViewModel
+import com.tashila.hazle.ui.components.dialogs.ConfirmationDialog
 import com.tashila.hazle.ui.components.thread.ThreadItem
 import com.tashila.hazle.ui.theme.WhisperFontFamily
 
@@ -49,6 +54,7 @@ fun ThreadsScreen(
 ) {
     val allThreads by threadsViewModel.allThreads.collectAsState()
     val selectedThreadId by threadsViewModel.selectedThreadId.collectAsState()
+    var showDeleteConfirmation by remember { mutableStateOf<ThreadEntity?>(null) }
 
     Scaffold(
         topBar = {
@@ -131,7 +137,7 @@ fun ThreadsScreen(
                                 threadsViewModel.selectThread(it.id)
                                 onThreadSelected(it.id) // Notify parent about selection
                             },
-                            onDeleteClick = { threadsViewModel.deleteThread(it.id) },
+                            onDeleteClick = { showDeleteConfirmation = it },
                             onRenameClick = { threadsViewModel.updateThread(it) },
                             onTogglePinClick = { threadsViewModel.toggleThreadPin(it) },
                             modifier = Modifier
@@ -141,6 +147,17 @@ fun ThreadsScreen(
                     }
                 }
             }
+        }
+
+        if (showDeleteConfirmation != null) {
+            ConfirmationDialog(
+                onConfirm = {
+                    showDeleteConfirmation?.let { threadsViewModel.deleteThread(it.id) }
+                },
+                onDismiss = { showDeleteConfirmation = null },
+                title = stringResource(id = R.string.delete_thread_confirmation_title),
+                message = stringResource(id = R.string.delete_thread_confirmation_message)
+            )
         }
     }
 }
