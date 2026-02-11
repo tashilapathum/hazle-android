@@ -3,6 +3,7 @@
 
     <!-- Chats -->
 
+    <string name="hazle_it">හේසල්</string>
     <string name="no_chats_title">කතාබස් නැත.</string>
     <string name="no_chats_description">අලුත් කතාබහක් පටන් ගන්න \'+\' ඔබන්න!</string>
     <string name="no_chats_content_description">කතාබස් නැත</string>

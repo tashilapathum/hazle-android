@@ -3,6 +3,7 @@
 
     <!-- Chats -->
 
+    <string name="hazle_it">Hazle it</string>
     <string name="no_chats_title">No chats yet.</string>
     <string name="no_chats_description">Tap \'+\' to start a new conversation!</string>
     <string name="no_chats_content_description">No chats</string>
