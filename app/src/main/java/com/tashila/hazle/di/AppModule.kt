@@ -13,10 +13,11 @@ import com.tashila.hazle.features.chat.ChatRepository
 import com.tashila.hazle.features.chat.ChatRepositoryImpl
 import com.tashila.hazle.features.chat.ChatViewModel
 import com.tashila.hazle.features.paywall.PaywallViewModel
+import com.tashila.hazle.features.paywall.RevenueCatRepository
+import com.tashila.hazle.features.paywall.RevenueCatRepositoryImpl
 import com.tashila.hazle.features.settings.SettingsRepository
 import com.tashila.hazle.features.settings.SettingsRepositoryImpl
 import com.tashila.hazle.features.settings.SettingsViewModel
-import com.tashila.hazle.features.subscription.SubscriptionManager
 import com.tashila.hazle.features.thread.ThreadRepository
 import com.tashila.hazle.features.thread.ThreadRepositoryImpl
 import com.tashila.hazle.features.thread.ThreadsViewModel
@@ -59,7 +60,7 @@ val appModule = module {
     ) }
     single<ThreadRepository> { ThreadRepositoryImpl(get()) }
     single<SettingsRepository> { SettingsRepositoryImpl(get()) }
-    single { SubscriptionManager(get()) }
+    single<RevenueCatRepository> { RevenueCatRepositoryImpl() }
 
     // --- Context-dependant Providers ---
     single { provideClock() }

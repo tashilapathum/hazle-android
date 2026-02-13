@@ -77,6 +77,11 @@
     <string name="about_title">ගැන</string>
     <string name="about_description_version">අනුවාදය %s</string>
     <string name="advanced_settings_section_title">Advanced</string>
+    <string name="manage_subscription_title">ඔබට active subscription එකක් තිබේ</string>
+    <string name="manage_subscription_description">Google Play හරහා ඔබේ subscription සහ billing විස්තර manage කරන්න.</string>
+    <string name="manage_subscription_button">Subscription එක manage කරන්න</string>
+    <string name="current_plan_pro">Pro Plan එක</string>
+    <string name="current_plan_vip">VIP Plan එක</string>
 
     <!-- Paywall Screen -->
 

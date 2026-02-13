@@ -5,7 +5,7 @@ on:
     tags: [ "v*" ]
 
 permissions:
-  contents: write 
+  contents: write
 
 jobs:
   build:
@@ -32,6 +32,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleRelease
         env:
+          REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       # 2. Sign the APK

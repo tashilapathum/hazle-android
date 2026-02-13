@@ -16,7 +16,6 @@ import io.sentry.android.core.SentryAndroidOptions
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
-
 class MyApplication : Application(), LifecycleObserver {
 
     override fun onCreate() {
@@ -81,15 +80,12 @@ class MyApplication : Application(), LifecycleObserver {
     }
 
     private fun initializeRevenueCat() {
-        class MainApplication: Application() {
-            override fun onCreate() {
-                super.onCreate()
-                Purchases.logLevel = LogLevel.DEBUG
-                Purchases.configure(
-                    PurchasesConfiguration.Builder(this, "test_jekfJzauYRHSbyCUDcqlQYpnXqi")
-                    .build())
-            }
-        }
+        Purchases.logLevel = if (BuildConfig.DEBUG) LogLevel.VERBOSE else LogLevel.ERROR
+        Purchases.configure(
+            PurchasesConfiguration.Builder(
+                this, getString(R.string.revenuecat_api_key)
+            ).build()
+        )
     }
 
     companion object {

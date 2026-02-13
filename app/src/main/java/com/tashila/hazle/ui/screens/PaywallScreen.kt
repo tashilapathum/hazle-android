@@ -1,5 +1,7 @@
 package com.tashila.hazle.ui.screens
 
+import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,38 +26,53 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.tashila.hazle.R
+import com.tashila.hazle.features.paywall.PaywallViewModel
 import com.tashila.hazle.ui.components.paywall.ComparisonTable
 import com.tashila.hazle.ui.components.paywall.FinePrintText
 import com.tashila.hazle.ui.components.paywall.IndieDeveloperNote
 import com.tashila.hazle.ui.components.paywall.Plan
 import com.tashila.hazle.ui.components.paywall.PlanCard
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun PaywallScreen(
     onBackClicked: () -> Unit,
+    onPurchaseCompleted: () -> Unit,
+    viewModel: PaywallViewModel = koinViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val pagerState = rememberPagerState(initialPage = 1) { 3 }
-    var showPaywall by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
 
-    val plans = remember {
+    LaunchedEffect(uiState.purchaseResult) {
+        uiState.purchaseResult?.let {
+            if (it.customerInfo.entitlements.active.isNotEmpty()) {
+                onPurchaseCompleted()
+            } else {
+                Toast.makeText(context, "Purchase failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    val plans = remember(uiState) {
         listOf(
             Plan(
                 title = R.string.paywall_free_tier_title,
-                price = R.string.paywall_free_tier_price,
+                price = "$0",
                 features = listOf(
                     R.string.paywall_free_feature_1,
                     R.string.paywall_free_feature_2,
@@ -63,11 +80,10 @@ fun PaywallScreen(
                     R.string.paywall_free_feature_4
                 ),
                 ctaText = R.string.paywall_free_tier_cta,
-                isCtaEnabled = false
             ),
             Plan(
                 title = R.string.paywall_pro_tier_title,
-                price = R.string.paywall_pro_tier_price,
+                price = uiState.annual?.product?.price?.formatted,
                 subtitle = R.string.paywall_pro_tier_subtitle,
                 features = listOf(
                     R.string.paywall_pro_feature_1,
@@ -75,11 +91,12 @@ fun PaywallScreen(
                     R.string.paywall_pro_feature_3
                 ),
                 ctaText = R.string.paywall_pro_tier_cta,
-                isRecommended = true
+                isRecommended = true,
+                revenueCatPackage = uiState.annual
             ),
             Plan(
                 title = R.string.paywall_byok_tier_title,
-                price = R.string.paywall_byok_tier_price,
+                price = uiState.lifetime?.product?.price?.formatted,
                 subtitle = R.string.paywall_byok_tier_subtitle,
                 features = listOf(
                     R.string.paywall_byok_feature_1,
@@ -87,10 +104,13 @@ fun PaywallScreen(
                     R.string.paywall_byok_feature_3,
                     R.string.paywall_byok_feature_4,
                 ),
-                ctaText = R.string.paywall_byok_tier_cta
+                ctaText = R.string.paywall_byok_tier_cta,
+                revenueCatPackage = uiState.lifetime
             )
         )
     }
+
+    val pagerState = rememberPagerState(initialPage = 1) { plans.size }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -142,6 +162,7 @@ fun PaywallScreen(
                     val plan = plans[page]
                     PlanCard(
                         plan = plan,
+                        onCtaClicked = { viewModel.purchasePackage(context as Activity, plan.revenueCatPackage!!) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -181,10 +202,6 @@ fun PaywallScreen(
                     )
                 }
             }
-        }
-
-        if (showPaywall) {
-
         }
     }
 }

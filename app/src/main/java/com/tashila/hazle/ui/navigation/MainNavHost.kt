@@ -99,7 +99,11 @@ fun MainNavHost(
             PaywallScreen(
                 onBackClicked = {
                     navController.popBackStack()
-                }
+                },
+                onPurchaseCompleted = {
+
+                },
+                viewModel = koinViewModel()
             )
         }
         composable(ONBOARDING_ROUTE) {

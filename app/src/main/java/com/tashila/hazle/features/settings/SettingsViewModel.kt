@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.auth.UserInfo
-import com.tashila.hazle.features.subscription.SubscriptionManager
+import com.tashila.hazle.features.paywall.RevenueCatRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +19,7 @@ class SettingsViewModel(
     // Koin will inject this dependency automatically
     private val repository: SettingsRepository,
     private val authRepository: AuthRepository,
-    private val subscriptionManager: SubscriptionManager
+    private val revenueCatRepository: RevenueCatRepository
 ) : ViewModel() {
 
     // State for user information
@@ -38,7 +38,11 @@ class SettingsViewModel(
     private val _selectedLocale = MutableStateFlow(Locale.getDefault().language)
     val selectedLocale: StateFlow<String> = _selectedLocale.asStateFlow()
 
-    val isSubscribed = subscriptionManager.isSubscribed
+    private val _isSubscribed = MutableStateFlow(false)
+    val isSubscribed: StateFlow<Boolean> = _isSubscribed.asStateFlow()
+
+    private val _currentPlan = MutableStateFlow<String?>(null)
+    val currentPlan: StateFlow<String?> = _currentPlan.asStateFlow()
 
     init {
         // Collect user info from repository
@@ -48,6 +52,19 @@ class SettingsViewModel(
         // Collect Locale
         viewModelScope.launch {
             repository.getLocale().collect { _selectedLocale.value = it }
+        }
+        // Collect subscription status
+        viewModelScope.launch {
+            revenueCatRepository.customerInfo.collect { customerInfo ->
+                val isPro = revenueCatRepository.hasProAccess(customerInfo)
+                val isVip = revenueCatRepository.hasVipAccess(customerInfo)
+                _isSubscribed.value = isPro || isVip
+                _currentPlan.value = when {
+                    isVip -> "VIP Plan"
+                    isPro -> "Pro Plan"
+                    else -> null
+                }
+            }
         }
     }
 

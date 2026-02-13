@@ -1,31 +1,65 @@
 package com.tashila.hazle.features.paywall
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.revenuecat.purchases.Offering
-import com.revenuecat.purchases.Purchases
-import com.revenuecat.purchases.PurchasesException
-import com.revenuecat.purchases.getOfferingsWith
+import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.PurchaseResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class PaywallViewModel(private val purchases: Purchases) : ViewModel() {
+data class PaywallState(
+    val isLoading: Boolean = false,
+    val monthly: Package? = null,
+    val annual: Package? = null,
+    val lifetime: Package? = null,
+    val error: String? = null,
+    val purchaseResult: PurchaseResult? = null
+)
 
-    private val _offering = MutableStateFlow<Offering?>(null)
-    val offering = _offering.asStateFlow()
+class PaywallViewModel(
+    private val revenueCatRepository: RevenueCatRepository
+) : ViewModel() {
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
+    private val _uiState = MutableStateFlow(PaywallState(isLoading = true))
+    val uiState = _uiState.asStateFlow()
 
     init {
+        loadOfferings()
+    }
+
+    private fun loadOfferings() {
         viewModelScope.launch {
-            try {
-                purchases.getOfferingsWith { offerings ->
-                    _offering.value = offerings.current
+            revenueCatRepository.offerings.collect { offerings ->
+                val current = offerings.current
+                if (current != null) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            monthly = runCatching { current.getPackage($$"$rc_monthly") }.getOrNull(),
+                            annual = runCatching { current.getPackage($$"$rc_annual") }.getOrNull(),
+                            lifetime = runCatching { current.getPackage($$"$rc_lifetime") }.getOrNull(),
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "No offerings found"
+                        )
+                    }
                 }
-            } catch (e: PurchasesException) {
-                _error.value = e.message
+            }
+        }
+    }
+
+    fun purchasePackage(activity: Activity, aPackage: Package) {
+        viewModelScope.launch {
+            val purchaseResult = revenueCatRepository.purchasePackage(activity, aPackage)
+            _uiState.update {
+                it.copy(purchaseResult = purchaseResult)
             }
         }
     }
