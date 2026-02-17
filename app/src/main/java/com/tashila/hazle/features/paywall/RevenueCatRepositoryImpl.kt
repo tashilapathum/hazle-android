@@ -13,20 +13,47 @@ import com.revenuecat.purchases.awaitPurchase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
+/**
+ * Implementation of [RevenueCatRepository] using the RevenueCat SDK.
+ * This class handles all interactions with RevenueCat for subscriptions.
+ */
 class RevenueCatRepositoryImpl : RevenueCatRepository {
 
+    /**
+     * A flow that emits the latest [CustomerInfo] for the user.
+     */
     override val customerInfo: Flow<CustomerInfo> = flow { emit(Purchases.sharedInstance.awaitCustomerInfo()) }
+
+    /**
+     * A flow that emits the available [Offerings] from RevenueCat.
+     */
     override val offerings: Flow<Offerings> = flow { emit(Purchases.sharedInstance.awaitOfferings()) }
 
+    /**
+     * Initiates a purchase for a specific [Package].
+     * @param activity The current activity.
+     * @param packageToPurchase The package to purchase.
+     * @return The result of the purchase.
+     */
     override suspend fun purchasePackage(activity: Activity, packageToPurchase: Package): PurchaseResult {
         val purchaseParams = PurchaseParams.Builder(activity, packageToPurchase).build()
         return Purchases.sharedInstance.awaitPurchase(purchaseParams)
     }
 
+    /**
+     * Checks if the user has "pro" access based on their entitlements.
+     * @param customerInfo The user's customer info.
+     * @return True if the user has "pro" access, false otherwise.
+     */
     override fun hasProAccess(customerInfo: CustomerInfo): Boolean {
         return customerInfo.entitlements["pro_access"]?.isActive == true
     }
 
+    /**
+     * Checks if the user has "vip" access based on their entitlements.
+     * @param customerInfo The user's customer info.
+     * @return True if the user has "vip" access, false otherwise.
+     */
     override fun hasVipAccess(customerInfo: CustomerInfo): Boolean {
         return customerInfo.entitlements["vip_access"]?.isActive == true
     }

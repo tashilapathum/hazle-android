@@ -14,6 +14,7 @@ import java.util.Locale
 /**
  * ViewModel for the Settings screen.
  * Manages UI-related data and logic, interacting with the SettingsRepository.
+ * It also observes the user's subscription status from [RevenueCatRepository].
  */
 class SettingsViewModel(
     // Koin will inject this dependency automatically

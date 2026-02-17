@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * Represents the state of the paywall screen.
+ */
 data class PaywallState(
     val isLoading: Boolean = false,
     val monthly: Package? = null,
@@ -19,17 +22,28 @@ data class PaywallState(
     val purchaseResult: PurchaseResult? = null
 )
 
+/**
+ * ViewModel for the paywall screen.
+ * It is responsible for loading subscription offerings and handling the purchase flow.
+ */
 class PaywallViewModel(
     private val revenueCatRepository: RevenueCatRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PaywallState(isLoading = true))
+
+    /**
+     * The UI state for the paywall screen.
+     */
     val uiState = _uiState.asStateFlow()
 
     init {
         loadOfferings()
     }
 
+    /**
+     * Loads the available subscription packages from RevenueCat.
+     */
     private fun loadOfferings() {
         viewModelScope.launch {
             revenueCatRepository.offerings.collect { offerings ->
@@ -55,6 +69,11 @@ class PaywallViewModel(
         }
     }
 
+    /**
+     * Initiates the purchase of a subscription package.
+     * @param activity The current activity.
+     * @param aPackage The package to purchase.
+     */
     fun purchasePackage(activity: Activity, aPackage: Package) {
         viewModelScope.launch {
             val purchaseResult = revenueCatRepository.purchasePackage(activity, aPackage)
