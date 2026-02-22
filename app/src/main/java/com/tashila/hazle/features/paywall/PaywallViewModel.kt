@@ -4,11 +4,19 @@ import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revenuecat.purchases.Package
-import com.revenuecat.purchases.PurchaseResult
+import com.revenuecat.purchases.models.StoreTransaction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+sealed class PurchaseState {
+    object NotStarted : PurchaseState()
+    object InProgress : PurchaseState()
+    data class Success(val storeTransaction: StoreTransaction) : PurchaseState()
+    data class Failure(val message: String) : PurchaseState()
+    object Cancelled : PurchaseState()
+}
 
 /**
  * Represents the state of the paywall screen.
@@ -19,7 +27,7 @@ data class PaywallState(
     val annual: Package? = null,
     val lifetime: Package? = null,
     val error: String? = null,
-    val purchaseResult: PurchaseResult? = null
+    val purchaseState: PurchaseState = PurchaseState.NotStarted
 )
 
 /**
@@ -76,10 +84,20 @@ class PaywallViewModel(
      */
     fun purchasePackage(activity: Activity, aPackage: Package) {
         viewModelScope.launch {
+            _uiState.update { it.copy(purchaseState = PurchaseState.InProgress) }
             val purchaseResult = revenueCatRepository.purchasePackage(activity, aPackage)
             _uiState.update {
-                it.copy(purchaseResult = purchaseResult)
+                val newPurchaseState = when {
+                    purchaseResult == null -> PurchaseState.Failure("Purchase failed")
+                    purchaseResult.customerInfo.entitlements.active.isNotEmpty() -> PurchaseState.Success(purchaseResult.storeTransaction)
+                    else -> PurchaseState.Failure("Purchase failed")
+                }
+                it.copy(purchaseState = newPurchaseState)
             }
         }
+    }
+
+    fun resetPurchaseState() {
+        _uiState.update { it.copy(purchaseState = PurchaseState.NotStarted) }
     }
 }

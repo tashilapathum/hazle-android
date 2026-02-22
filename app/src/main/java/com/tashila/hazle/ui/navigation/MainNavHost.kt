@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import com.tashila.hazle.features.chat.ChatViewModel
 import com.tashila.hazle.ui.navigation.AppDestinations.ONBOARDING_ROUTE
 import com.tashila.hazle.ui.navigation.AppDestinations.SETTINGS_ROUTE
+import com.tashila.hazle.ui.navigation.AppDestinations.THANK_YOU_ROUTE
 import com.tashila.hazle.ui.navigation.AppDestinations.THREADS_ROUTE
 import com.tashila.hazle.ui.navigation.AppDestinations.UPGRADE_ROUTE
 import com.tashila.hazle.ui.navigation.AppDestinations.chatDetailRoute
@@ -20,6 +21,7 @@ import com.tashila.hazle.ui.screens.ChatScreen
 import com.tashila.hazle.ui.screens.OnboardingScreen
 import com.tashila.hazle.ui.screens.PaywallScreen
 import com.tashila.hazle.ui.screens.SettingsScreen
+import com.tashila.hazle.ui.screens.ThankYouScreen
 import com.tashila.hazle.ui.screens.ThreadsScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -101,10 +103,19 @@ fun MainNavHost(
                     navController.popBackStack()
                 },
                 onPurchaseCompleted = {
-
+                    navController.navigate(THANK_YOU_ROUTE) {
+                        popUpTo(UPGRADE_ROUTE) { inclusive = true }
+                    }
                 },
                 viewModel = koinViewModel()
             )
+        }
+        composable(THANK_YOU_ROUTE) {
+            ThankYouScreen(onDoneClicked = {
+                navController.navigate(THREADS_ROUTE) {
+                    popUpTo(THREADS_ROUTE) { inclusive = true }
+                }
+            })
         }
         composable(ONBOARDING_ROUTE) {
             OnboardingScreen(

@@ -16,6 +16,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.tashila.hazle.R
 import com.tashila.hazle.features.paywall.PaywallViewModel
+import com.tashila.hazle.features.paywall.PurchaseState
 import com.tashila.hazle.ui.components.paywall.ComparisonTable
 import com.tashila.hazle.ui.components.paywall.FinePrintText
 import com.tashila.hazle.ui.components.paywall.IndieDeveloperNote
@@ -58,13 +60,24 @@ fun PaywallScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(uiState.purchaseResult) {
-        uiState.purchaseResult?.let {
-            if (it.customerInfo.entitlements.active.isNotEmpty()) {
+    LaunchedEffect(uiState.purchaseState) {
+        when (val state = uiState.purchaseState) {
+            is PurchaseState.Success -> {
                 onPurchaseCompleted()
-            } else {
-                Toast.makeText(context, "Purchase failed", Toast.LENGTH_SHORT).show()
+                viewModel.resetPurchaseState()
             }
+
+            is PurchaseState.Failure -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                viewModel.resetPurchaseState()
+            }
+
+            is PurchaseState.Cancelled -> {
+                Toast.makeText(context, "Purchase cancelled", Toast.LENGTH_SHORT).show()
+                viewModel.resetPurchaseState()
+            }
+
+            else -> {}
         }
     }
 

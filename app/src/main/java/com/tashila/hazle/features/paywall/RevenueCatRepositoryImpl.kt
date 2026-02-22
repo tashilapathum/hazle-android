@@ -7,6 +7,7 @@ import com.revenuecat.purchases.Package
 import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.PurchaseResult
 import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.PurchasesTransactionException
 import com.revenuecat.purchases.awaitCustomerInfo
 import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
@@ -33,11 +34,15 @@ class RevenueCatRepositoryImpl : RevenueCatRepository {
      * Initiates a purchase for a specific [Package].
      * @param activity The current activity.
      * @param packageToPurchase The package to purchase.
-     * @return The result of the purchase.
+     * @return The result of the purchase, or null if it fails.
      */
-    override suspend fun purchasePackage(activity: Activity, packageToPurchase: Package): PurchaseResult {
+    override suspend fun purchasePackage(activity: Activity, packageToPurchase: Package): PurchaseResult? {
         val purchaseParams = PurchaseParams.Builder(activity, packageToPurchase).build()
-        return Purchases.sharedInstance.awaitPurchase(purchaseParams)
+        return try {
+            Purchases.sharedInstance.awaitPurchase(purchaseParams)
+        } catch (e: PurchasesTransactionException) {
+            null
+        }
     }
 
     /**
