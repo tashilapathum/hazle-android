@@ -3,8 +3,9 @@
 
     <!-- Chats -->
 
+    <string name="hazle_it">Hazle it</string>
     <string name="no_chats_title">Noch keine Chats.</string>
-    <string name="no_chats_description">Tippe auf das \'+\' unten, um eine neue Unterhaltung zu starten!</string>
+    <string name="no_chats_description">Tippe auf das '+' unten, um eine neue Unterhaltung zu starten!</string>
     <string name="no_chats_content_description">Keine Chats</string>
     <string name="about_hazle_title">Über Hazle</string>
     <string name="about_hazle_text">Hazle kann Fehler machen. Überprüfe wichtige Infos.</string>
@@ -12,6 +13,8 @@
     <string name="type_message_hint">Hazle fragen…</string>
     <string name="rename_chat_title">Chat umbenennen</string>
     <string name="enter_new_name_label">Neuen Namen eingeben</string>
+    <string name="delete_thread_confirmation_title">Thread löschen?</string>
+    <string name="delete_thread_confirmation_message">Möchtest du diesen Thread wirklich löschen?</string>
 
     <!-- Authentication -->
 
@@ -36,7 +39,7 @@
     <!-- Onboarding -->
 
     <string name="onboarding_page1_title">Jederzeit und überall mit der KI chatten</string>
-    <string name="onboarding_page1_text">Wähle einfach etwas Text oder die ganze Seite aus und \"Hazle it\", um eine Unterhaltung zu beginnen.</string>
+    <string name="onboarding_page1_text">Wähle einfach etwas Text oder die ganze Seite aus und "Hazle it", um eine Unterhaltung zu beginnen.</string>
     <string name="onboarding_page2_title">Auswählen und teilen</string>
     <string name="onboarding_page2_text">Wenn die App Hazle nicht im Kontextmenü enthält, teile es über das Teilen-Menü.</string>
     <string name="onboarding_page3_title">Kein Warten mehr auf Antworten</string>

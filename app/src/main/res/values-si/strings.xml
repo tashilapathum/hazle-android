@@ -3,6 +3,7 @@
 
     <!-- Chats -->
 
+    <string name="hazle_it">හේසල්</string>
     <string name="no_chats_title">කතාබස් නැත.</string>
     <string name="no_chats_description">අලුත් කතාබහක් පටන් ගන්න \'+\' ඔබන්න!</string>
     <string name="no_chats_content_description">කතාබස් නැත</string>
@@ -12,6 +13,10 @@
     <string name="type_message_hint">හේසල්ගෙන් අසන්න…</string>
     <string name="rename_chat_title">සංවාදයේ නම වෙනස් කරන්න</string>
     <string name="enter_new_name_label">නව නමක් ඇතුළත් කරන්න</string>
+    <string name="delete_thread_confirmation_title">චැට් එක මකා දමන්නද?</string>
+    <string name="delete_thread_confirmation_message">මෙම චැට් එක මකා දැමීමට ඔබට විශ්වාසද?</string>
+
+
 
     <!-- Authentication -->
 

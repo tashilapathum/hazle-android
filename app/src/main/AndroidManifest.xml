@@ -42,7 +42,7 @@
             android:name=".ui.activities.TextReceiverActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
-            android:label="Hazle it"
+            android:label="@string/hazle_it"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
