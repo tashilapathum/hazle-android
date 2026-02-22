@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -172,7 +174,12 @@ fun SettingsScreen(
                     icon = Icons.Outlined.Language,
                     title = stringResource(id = R.string.language_setting_title),
                     description = language,
-                    onClick = { showLanguageDialog = true }
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                            openAppLanguageSettings(context)
+                        else
+                            showLanguageDialog = true
+                    }
                 )
             }
 
@@ -261,6 +268,15 @@ fun SettingsScreen(
             onSave = {  } //TODO
         )
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+fun openAppLanguageSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
+        data = "package:${context.packageName}".toUri()
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
 }
 
 fun openAppNotificationSettings(context: Context) {
