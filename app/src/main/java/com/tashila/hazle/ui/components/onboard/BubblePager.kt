@@ -29,6 +29,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
@@ -41,6 +43,7 @@ import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -76,7 +79,12 @@ fun BubblePager(
     vector: ImageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
     content: @Composable PagerScope.(Int) -> Unit
 ) {
-    val icon = rememberVectorPainter(vector)
+    val isLastPage = pagerState.currentPage == pageCount - 1
+    val painter = if (isLastPage) {
+        rememberVectorPainter(image = Icons.Outlined.Check)
+    } else {
+        rememberVectorPainter(image = vector)
+    }
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
     val arrowBubbleRadius by animateDpAsState(
         targetValue = if (pagerState.shouldHideBubble(isDragged)) 0.dp else bubbleMinRadius,
@@ -91,7 +99,7 @@ fun BubblePager(
     Box(modifier = modifier) {
         HorizontalPager(
             state = pagerState,
-            flingBehavior = bubblePagerFlingBehavior(pagerState),
+            flingBehavior = bubblePagerFlingBehavior(pagerState, pageCount, onFinished),
             modifier = Modifier.drawBehind {
                 drawRect(color = bubbleColors[pagerState.currentPage], size = size)
                 val (radius, centerX) = calculateBubbleDimensions(
@@ -110,7 +118,7 @@ fun BubblePager(
                     radius = arrowBubbleRadius,
                     bottomPadding = bubbleBottomPadding,
                     color = pagerState.getNextBubbleColor(bubbleColors),
-                    icon = icon,
+                    icon = painter,
                     iconSize = arrowIconSize
                 )
             }
@@ -190,7 +198,7 @@ fun calculateBubbleDimensions(
     minRadius: Dp,
     maxRadius: Dp
 ): Pair<Dp, Dp> {
-    // swipe value ranges between 0 to 1.0 for half of the swipe
+    // swipe value ranges between 0 and 1.0 for half of the swipe
     // and 1.0 to 0 for the other half of the swipe
     val swipeValue = lerp(0f, 2f, swipeProgress.absoluteValue)
     val radius = lerp(
@@ -210,11 +218,32 @@ fun calculateBubbleDimensions(
 }
 
 @Composable
-fun bubblePagerFlingBehavior(pagerState: PagerState) =
-    PagerDefaults.flingBehavior(
+fun bubblePagerFlingBehavior(
+    pagerState: PagerState,
+    pageCount: Int,
+    onFinished: () -> Unit,
+): TargetedFlingBehavior {
+    val flingBehavior = PagerDefaults.flingBehavior(
         state = pagerState,
         snapAnimationSpec = spring(dampingRatio = 1.9f, stiffness = 600f),
     )
+
+    return remember(flingBehavior, pagerState, onFinished, pageCount) {
+        object : TargetedFlingBehavior {
+            override suspend fun ScrollScope.performFling(
+                initialVelocity: Float,
+                onRemainingDistanceUpdated: (Float) -> Unit
+            ): Float {
+                val isLastPage = pagerState.currentPage == pageCount - 1
+                if (isLastPage && initialVelocity > 0) {
+                    onFinished()
+                    return initialVelocity
+                }
+                return with(flingBehavior) { performFling(initialVelocity, onRemainingDistanceUpdated) }
+            }
+        }
+    }
+}
 
 fun PagerState.getBubbleColor(bubbleColors: List<Color>): Color {
     val index = if (currentPageOffsetFraction < 0) {

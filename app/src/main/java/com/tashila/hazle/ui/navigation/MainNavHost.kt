@@ -119,11 +119,7 @@ fun MainNavHost(
         }
         composable(ONBOARDING_ROUTE) {
             OnboardingScreen(
-                pagerState = rememberPagerState(
-                    0,
-                    initialPageOffsetFraction = 0F,
-                    pageCount = { 4 }
-                ),
+                pagerState = rememberPagerState(pageCount = { 4 }),
                 onboardingFinished = { onboardingFinished.invoke() }
             )
         }
