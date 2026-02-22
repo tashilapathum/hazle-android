@@ -77,6 +77,11 @@
     <string name="about_title">Über</string>
     <string name="about_description_version">Version %s</string>
     <string name="advanced_settings_section_title">Erweitert</string>
+    <string name="manage_subscription_title">Sie haben ein aktives Abonnement</string>
+    <string name="manage_subscription_description">Verwalten Sie Ihr Abonnement und Ihre Rechnungsdetails über Google Play.</string>
+    <string name="manage_subscription_button">Abonnement verwalten</string>
+    <string name="current_plan_pro">Pro-Plan</string>
+    <string name="current_plan_vip">VIP-Plan</string>
 
     <!-- Paywall Screen -->
 

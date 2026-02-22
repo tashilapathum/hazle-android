@@ -77,6 +77,11 @@
     <string name="about_title">About</string>
     <string name="about_description_version">Version %s</string>
     <string name="advanced_settings_section_title">Advanced</string>
+    <string name="manage_subscription_title">Subscription Active</string>
+    <string name="manage_subscription_description">Manage your subscription and billing details through Google Play.</string>
+    <string name="manage_subscription_button">Manage Subscription</string>
+    <string name="current_plan_pro">Pro Plan</string>
+    <string name="current_plan_vip">VIP Plan</string>
 
     <!-- Paywall Screen -->
     <string name="upgrade_to_pro_title">Free Tier</string>

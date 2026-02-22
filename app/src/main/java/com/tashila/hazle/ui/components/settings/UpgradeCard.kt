@@ -30,7 +30,10 @@ import com.tashila.hazle.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpgradeCard(
-    onClicked: () -> Unit
+    isSubscribed: Boolean,
+    currentPlan: String? = null,
+    onUpgradeClicked: () -> Unit = {},
+    onManageSubscriptionClicked: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -38,7 +41,7 @@ fun UpgradeCard(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
-        onClick = onClicked,
+        onClick = if (isSubscribed) onManageSubscriptionClicked else onUpgradeClicked,
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         )
@@ -75,20 +78,20 @@ fun UpgradeCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(id = R.string.upgrade_to_pro_title),
+                    text = if (isSubscribed) stringResource(id = R.string.manage_subscription_title) else stringResource(id = R.string.upgrade_to_pro_title),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = textColor
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = stringResource(id = R.string.unlock_all_features),
+                    text = if (isSubscribed) stringResource(id = R.string.manage_subscription_description) else stringResource(id = R.string.unlock_all_features),
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor.copy(alpha = 0.8f)
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = stringResource(id = R.string.pro_badge),
+                text = if (isSubscribed) currentPlan ?: "" else stringResource(id = R.string.pro_badge),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontStyle = FontStyle.Italic

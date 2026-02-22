@@ -29,7 +29,9 @@ android {
         versionName = "0.1.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "REVENUECAT_API_KEY", "\"${localProperties.getProperty("revenuecat.api.key")}\"")
+        resValue("string", "revenuecat_api_key",
+            System.getenv("REVENUECAT_API_KEY") ?: localProperties.getProperty("revenuecat.api.key")
+        )
     }
 
     buildTypes {

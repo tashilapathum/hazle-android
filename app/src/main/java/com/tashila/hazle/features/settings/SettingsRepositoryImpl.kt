@@ -17,7 +17,7 @@ import java.util.Locale
 
 /**
  * Implementation of the SettingsRepository using Jetpack DataStore for persistence.
- * This version uses DataStore for API URL and in-memory MutableStateFlow for user info simulation.
+ * This repository manages user settings and preferences.
  */
 class SettingsRepositoryImpl(private val dataStore: DataStore<Preferences>) : SettingsRepository {
 

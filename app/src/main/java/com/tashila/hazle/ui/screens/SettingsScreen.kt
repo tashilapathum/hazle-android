@@ -17,7 +17,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.tashila.hazle.R
 import com.tashila.hazle.features.settings.SettingsViewModel
 import com.tashila.hazle.ui.activities.LoginActivity
@@ -68,7 +68,8 @@ fun SettingsScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val message by viewModel.message.collectAsState()
     val language by viewModel.selectedLocale.collectAsState()
-    val isSubscribed by viewModel.isSubscribed.collectAsState()
+    val isSubscribed by viewModel.isSubscribed.collectAsState(initial = false)
+    val currentPlan by viewModel.currentPlan.collectAsState(initial = null)
 
     // State for managing the visibility of dialogs
     var showConfirmLogoutDialog by remember { mutableStateOf(false) }
@@ -120,20 +121,21 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                if (isSubscribed) {
-                    Button(onClick = {  }) {
-                        Text(text = "Manage Subscription")
-                    }
-                } else {
-                    UpgradeCard(onClicked = { onUpgradeClicked.invoke() })
-                }
+                UpgradeCard(
+                    isSubscribed = isSubscribed,
+                    currentPlan = currentPlan,
+                    onUpgradeClicked = { onUpgradeClicked.invoke() },
+                    onManageSubscriptionClicked = { openSubscriptionManagement(context) }
+                )
             }
 
             // Account info
             item {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
                     Text(
                         text = stringResource(id = R.string.account_section_title),
                         style = MaterialTheme.typography.titleMedium,
@@ -151,9 +153,11 @@ fun SettingsScreen(
 
             // General settings
             item {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
                     Text(
                         text = stringResource(id = R.string.general_settings_section_title),
                         style = MaterialTheme.typography.titleMedium,
@@ -187,15 +191,20 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Outlined.Info,
                     title = stringResource(id = R.string.about_title),
-                    description = stringResource(id = R.string.about_description_version, getAppVersion()),
+                    description = stringResource(
+                        id = R.string.about_description_version,
+                        getAppVersion()
+                    ),
                     onClick = { /* TODO: Show app version, credits, etc. */ }
                 )
             }
 
             item {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
                     Text(
                         text = stringResource(id = R.string.advanced_settings_section_title),
                         style = MaterialTheme.typography.titleMedium,
@@ -257,6 +266,14 @@ fun SettingsScreen(
 fun openAppNotificationSettings(context: Context) {
     val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
         putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
+}
+
+fun openSubscriptionManagement(context: Context) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = "https://play.google.com/store/account/subscriptions".toUri()
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)

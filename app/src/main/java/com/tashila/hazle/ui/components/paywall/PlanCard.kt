@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -30,7 +31,11 @@ import androidx.compose.ui.unit.dp
 import com.tashila.hazle.R
 
 @Composable
-fun PlanCard(plan: Plan, modifier: Modifier = Modifier) {
+fun PlanCard(
+    plan: Plan,
+    modifier: Modifier = Modifier,
+    onCtaClicked: () -> Unit,
+) {
     Card(
         modifier = modifier.height(IntrinsicSize.Max),
         colors = CardDefaults.cardColors(
@@ -51,7 +56,11 @@ fun PlanCard(plan: Plan, modifier: Modifier = Modifier) {
             Text(stringResource(id = plan.title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(id = plan.price), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                if (plan.price != null) {
+                    Text(plan.price, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                } else {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                }
                 plan.subtitle?.let {
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(id = it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -81,7 +90,7 @@ fun PlanCard(plan: Plan, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(24.dp))
             if (plan.isCtaEnabled) {
                 Button(
-                    onClick = { /* TODO */ },
+                    onClick = onCtaClicked,
                     modifier = Modifier.fillMaxWidth(),
                     colors = if (plan.isRecommended) ButtonDefaults.buttonColors() else ButtonDefaults.outlinedButtonColors(),
                     border = if (!plan.isRecommended) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
@@ -101,13 +110,3 @@ fun PlanCard(plan: Plan, modifier: Modifier = Modifier) {
         }
     }
 }
-
-data class Plan(
-    val title: Int,
-    val price: Int,
-    val features: List<Int>,
-    val ctaText: Int,
-    val subtitle: Int? = null,
-    val isRecommended: Boolean = false,
-    val isCtaEnabled: Boolean = true
-)
