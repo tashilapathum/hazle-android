@@ -51,7 +51,7 @@ class RevenueCatRepositoryImpl : RevenueCatRepository {
      * @return True if the user has "pro" access, false otherwise.
      */
     override fun hasProAccess(customerInfo: CustomerInfo): Boolean {
-        return customerInfo.entitlements["pro_access"]?.isActive == true
+        return customerInfo.entitlements[ENTITLEMENT_PRO]?.isActive == true
     }
 
     /**
@@ -60,6 +60,11 @@ class RevenueCatRepositoryImpl : RevenueCatRepository {
      * @return True if the user has "vip" access, false otherwise.
      */
     override fun hasVipAccess(customerInfo: CustomerInfo): Boolean {
-        return customerInfo.entitlements["vip_access"]?.isActive == true
+        return customerInfo.entitlements[ENTITLEMENT_VIP]?.isActive == true
+    }
+
+    companion object {
+        private const val ENTITLEMENT_PRO = "Hazle Pro"
+        private const val ENTITLEMENT_VIP = "Hazle VIP"
     }
 }

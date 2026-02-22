@@ -60,9 +60,9 @@ class PaywallViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            monthly = runCatching { current.getPackage($$"$rc_monthly") }.getOrNull(),
-                            annual = runCatching { current.getPackage($$"$rc_annual") }.getOrNull(),
-                            lifetime = runCatching { current.getPackage($$"$rc_lifetime") }.getOrNull(),
+                            monthly = runCatching { current.getPackage(PACKAGE_MONTHLY) }.getOrNull(),
+                            annual = runCatching { current.getPackage(PACKAGE_ANNUAL) }.getOrNull(),
+                            lifetime = runCatching { current.getPackage(PACKAGE_LIFETIME) }.getOrNull(),
                         )
                     }
                 } else {
@@ -99,5 +99,11 @@ class PaywallViewModel(
 
     fun resetPurchaseState() {
         _uiState.update { it.copy(purchaseState = PurchaseState.NotStarted) }
+    }
+
+    companion object {
+        private const val PACKAGE_MONTHLY = $$"$rc_monthly"
+        private const val PACKAGE_ANNUAL = $$"$rc_annual"
+        private const val PACKAGE_LIFETIME = $$"$rc_lifetime"
     }
 }
