@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,8 +23,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,7 +33,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.compose.DialogNavigator
 import com.tashila.hazle.R
 import com.tashila.hazle.features.auth.AuthRepository
 import com.tashila.hazle.features.chat.ChatViewModel
@@ -51,7 +53,6 @@ import org.koin.compose.koinInject
 class MainActivity : AppCompatActivity() {
     private var passedThreadId by mutableLongStateOf(-1L)
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -62,9 +63,10 @@ class MainActivity : AppCompatActivity() {
                 val chatViewModel: ChatViewModel = koinViewModel()
 
                 val context = LocalContext.current
-                val navController = rememberNavController()
+                val navController = rememberSavableNavController()
                 val coroutineScope = rememberCoroutineScope()
-                var askNotificationPermission by remember { mutableStateOf(false) }
+                var askNotificationPermission by rememberSaveable { mutableStateOf(false) }
+                var initialNavigationDone by rememberSaveable { mutableStateOf(false) }
 
                 // Set language
                 LaunchedEffect(Unit) {
@@ -72,28 +74,31 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // Determine initial navigation based on onboarding and authentication state
-                LaunchedEffect(Unit) {
-                    val isOnboarded = settingsRepository.isOnboarded()
-                    val isAuthenticated = authRepository.isAuthenticated()
+                if (!initialNavigationDone) {
+                    LaunchedEffect(Unit) {
+                        val isOnboarded = settingsRepository.isOnboarded()
+                        val isAuthenticated = authRepository.isAuthenticated()
 
-                    if (!isOnboarded) {
-                        // User is not onboarded, show onboarding
-                        navController.navigate(AppDestinations.ONBOARDING_ROUTE) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                inclusive = true // Clear back stack up to start destination
+                        if (!isOnboarded) {
+                            // User is not onboarded, show onboarding
+                            navController.navigate(AppDestinations.ONBOARDING_ROUTE) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true // Clear back stack up to start destination
+                                }
                             }
-                        }
-                    } else if (!isAuthenticated) {
-                        // User is onboarded but not logged in, show login
-                        showLogin(this@MainActivity)
-                    } else {
-                        // User is onboarded and logged in, navigate to threads and ask for permission
-                        navController.navigate(AppDestinations.THREADS_ROUTE) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                inclusive = true
+                        } else if (!isAuthenticated) {
+                            // User is onboarded but not logged in, show login
+                            showLogin(this@MainActivity)
+                        } else {
+                            // User is onboarded and logged in, navigate to threads and ask for permission
+                            navController.navigate(AppDestinations.THREADS_ROUTE) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
                             }
+                            askNotificationPermission = true
                         }
-                        askNotificationPermission = true
+                        initialNavigationDone = true
                     }
                 }
 
@@ -155,6 +160,28 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+@Composable
+private fun rememberSavableNavController(): NavHostController {
+    val context = LocalContext.current
+    return rememberSaveable(saver = navControllerSaver(context)) {
+        NavHostController(context).apply {
+            navigatorProvider.addNavigator(ComposeNavigator())
+            navigatorProvider.addNavigator(DialogNavigator())
+        }
+    }
+}
+
+private fun navControllerSaver(context: Context): Saver<NavHostController, Bundle> = Saver(
+    save = { it.saveState() },
+    restore = { savedState ->
+        NavHostController(context).apply {
+            navigatorProvider.addNavigator(ComposeNavigator())
+            navigatorProvider.addNavigator(DialogNavigator())
+            restoreState(savedState)
+        }
+    }
+)
+
 fun setAppLocale(localeTag: String) {
     val localeList = LocaleListCompat.forLanguageTags(localeTag)
     AppCompatDelegate.setApplicationLocales(localeList)
@@ -170,7 +197,7 @@ private fun showLogin(context: Context) {
 @Composable
 fun RequestNotificationPermission() {
     val context = LocalContext.current
-    var showPermissionRationale by remember { mutableStateOf(false) }
+    var showPermissionRationale by rememberSaveable { mutableStateOf(false) }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         PermissionRequester(
             permission = Manifest.permission.POST_NOTIFICATIONS,

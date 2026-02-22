@@ -1,5 +1,6 @@
 package com.tashila.hazle.ui.activities
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,13 +10,19 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.compose.DialogNavigator
 import com.tashila.hazle.features.auth.AuthViewModel
 import com.tashila.hazle.ui.activities.MainActivity.Companion.TAG
 import com.tashila.hazle.ui.components.AuroraBackground
@@ -44,7 +51,7 @@ class LoginActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = Color.Transparent
                     ) {
-                        val navController = rememberNavController()
+                        val navController = rememberSavableNavController()
                         authViewModel = koinViewModel()
 
                         // Collect one-time auth events for navigation or toasts
@@ -137,3 +144,25 @@ class LoginActivity : ComponentActivity() {
     }
 
 }
+
+@Composable
+private fun rememberSavableNavController(): NavHostController {
+    val context = LocalContext.current
+    return rememberSaveable(saver = navControllerSaver(context)) {
+        NavHostController(context).apply {
+            navigatorProvider.addNavigator(ComposeNavigator())
+            navigatorProvider.addNavigator(DialogNavigator())
+        }
+    }
+}
+
+private fun navControllerSaver(context: Context): Saver<NavHostController, Bundle> = Saver(
+    save = { it.saveState() },
+    restore = { savedState ->
+        NavHostController(context).apply {
+            navigatorProvider.addNavigator(ComposeNavigator())
+            navigatorProvider.addNavigator(DialogNavigator())
+            restoreState(savedState)
+        }
+    }
+)
