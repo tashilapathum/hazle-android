@@ -5,15 +5,20 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.Person
 import androidx.core.app.RemoteInput
 import androidx.core.graphics.drawable.IconCompat
+import androidx.core.net.toUri
 import com.tashila.hazle.MyApplication.Companion.CHAT_NOTIFICATIONS_CHANNEL_ID
 import com.tashila.hazle.R
 import com.tashila.hazle.features.chat.ChatRepository
 import com.tashila.hazle.features.chat.Message
+import com.tashila.hazle.ui.activities.BubbleChatActivity
 import com.tashila.hazle.ui.activities.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +57,7 @@ class NotificationService : Service(), KoinComponent {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == "SHOW_CHAT_NOTIFICATION") {
             val title = intent.getStringExtra(EXTRA_NOTIFICATION_TITLE) ?: "Notification"
-            val message = intent.getStringExtra(EXTRA_NOTIFICATION_MESSAGE) ?: "No message"
+            intent.getStringExtra(EXTRA_NOTIFICATION_MESSAGE) ?: "No message"
             val localThreadId = intent.getLongExtra(EXTRA_MESSAGE_THREAD_ID, -1L)
 
             serviceScope.launch {
@@ -148,6 +153,40 @@ class NotificationService : Service(), KoinComponent {
 
         // --- End of Reply Button Code ---
 
+        // --- Start of Bubble Code ---
+
+        val bubbleIntent = Intent(this, BubbleChatActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = "https://hazle.tashila.me/chat/$localThreadId".toUri()
+        }
+        val bubblePendingIntent = PendingIntent.getActivity(
+            this,
+            localThreadId.toInt(),
+            bubbleIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val shortcutManager = getSystemService(ShortcutManager::class.java)
+            val shortcut = ShortcutInfo.Builder(this, localThreadId.toString())
+                .setLongLived(true)
+                .setIntent(bubbleIntent)
+                .setShortLabel(title)
+                .build()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                shortcutManager.pushDynamicShortcut(shortcut)
+            } else {
+                shortcutManager.addDynamicShortcuts(listOf(shortcut))
+            }
+        }
+
+        val bubbleMetadata = NotificationCompat.BubbleMetadata.Builder(bubblePendingIntent,
+            IconCompat.createWithResource(this, R.drawable.ic_logo))
+            .setDesiredHeight(600)
+            .build()
+
+        // --- End of Bubble Code ---
+
         // Build the notification
         val notification = NotificationCompat.Builder(this, CHAT_NOTIFICATIONS_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_logo)
@@ -156,6 +195,8 @@ class NotificationService : Service(), KoinComponent {
             .setContentIntent(pendingIntent) // Set the intent to launch when tapped
             .setAutoCancel(true) // Notification disappears when tapped
             .addAction(replyAction)
+            .setShortcutId(localThreadId.toString())
+            .setBubbleMetadata(bubbleMetadata)
             .setAllowSystemGeneratedContextualActions(false)
             .build()
 
