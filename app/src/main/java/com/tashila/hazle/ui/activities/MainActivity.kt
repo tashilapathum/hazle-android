@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        handleIntent(intent)
         setContent {
             HazleTheme {
                 val authRepository: AuthRepository = koinInject()
@@ -125,11 +126,12 @@ class MainActivity : AppCompatActivity() {
                         )
 
                         // When coming from notification
-                        passedThreadId = intent.getLongExtra(EXTRA_MESSAGE_THREAD_ID, -1L)
-                        LaunchedEffect(key1 = passedThreadId) {
+                        LaunchedEffect(passedThreadId, initialNavigationDone) {
                             if (passedThreadId != -1L) {
                                 val targetRoute = AppDestinations.chatDetailRoute(passedThreadId)
-                                if (navController.currentDestination?.route != targetRoute) {
+                                val currentRoute = navController.currentDestination?.route
+
+                                if (currentRoute != targetRoute) {
                                     chatViewModel.setActiveThread(passedThreadId)
                                     navController.navigate(targetRoute) {
                                         popUpTo(navController.graph.startDestinationId) {
@@ -137,6 +139,9 @@ class MainActivity : AppCompatActivity() {
                                         }
                                         launchSingleTop = true
                                     }
+                                    // Reset ID so it doesn't re-trigger on recomposition
+                                    // unless a NEW intent comes in
+                                    passedThreadId = -1L
                                 }
                             }
                         }
@@ -146,6 +151,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent == null) return
+        setIntent(intent)
+        passedThreadId = intent.getLongExtra(EXTRA_MESSAGE_THREAD_ID, -1L)
     }
 
     companion object {

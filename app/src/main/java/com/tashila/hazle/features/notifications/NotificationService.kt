@@ -196,6 +196,7 @@ class NotificationService : Service(), KoinComponent {
             .setAutoCancel(true) // Notification disappears when tapped
             .addAction(replyAction)
             .setShortcutId(localThreadId.toString())
+            .addPerson(assistant)
             .setBubbleMetadata(bubbleMetadata)
             .setAllowSystemGeneratedContextualActions(false)
             .build()
