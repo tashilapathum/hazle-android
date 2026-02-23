@@ -22,6 +22,21 @@
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="33">
         <activity
+            android:name=".ui.activities.BubbleChatActivity"
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar"
+            android:label="Bubble"
+            android:allowEmbedded="true"
+            android:resizeableActivity="true"
+            android:documentLaunchMode="always"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="hazle.tashila.me" android:pathPrefix="/chat"/>
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".ui.activities.LoginActivity"
             android:launchMode="singleTask"
             android:exported="true"
