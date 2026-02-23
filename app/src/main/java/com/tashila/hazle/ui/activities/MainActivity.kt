@@ -89,15 +89,8 @@ class MainActivity : AppCompatActivity() {
                         } else if (!isAuthenticated) {
                             // User is onboarded but not logged in, show login
                             showLogin(this@MainActivity)
-                        } else {
-                            // User is onboarded and logged in, navigate to threads and ask for permission
-                            navController.navigate(AppDestinations.THREADS_ROUTE) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    inclusive = true
-                                }
-                            }
-                            askNotificationPermission = true
                         }
+
                         initialNavigationDone = true
                     }
                 }
