@@ -146,5 +146,6 @@
     <string name="paywall_byok_feature_2">Alle Pro-Features dauerhaft freigeschaltet</string>
     <string name="paywall_byok_feature_3">Cloud-Sync inklusive</string>
     <string name="paywall_byok_feature_4">Priorisierter Support für Feature-Anfragen</string>
+    <string name="paywall_restore_purchases">Käufe wiederherstellen</string>
 
 </resources>

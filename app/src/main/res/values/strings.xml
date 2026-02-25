@@ -145,4 +145,5 @@
     <string name="paywall_byok_feature_2">Unlock all Pro features forever</string>
     <string name="paywall_byok_feature_3">Cloud Sync included</string>
     <string name="paywall_byok_feature_4">Priority support for feature requests</string>
+    <string name="paywall_restore_purchases">Restore Purchases</string>
 </resources>

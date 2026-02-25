@@ -16,7 +16,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +23,7 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -74,6 +74,12 @@ fun PaywallScreen(
 
             is PurchaseState.Cancelled -> {
                 Toast.makeText(context, "Purchase cancelled", Toast.LENGTH_SHORT).show()
+                viewModel.resetPurchaseState()
+            }
+
+            is PurchaseState.Restored -> {
+                Toast.makeText(context, "Purchases restored", Toast.LENGTH_SHORT).show()
+                onPurchaseCompleted()
                 viewModel.resetPurchaseState()
             }
 
@@ -178,6 +184,18 @@ fun PaywallScreen(
                         onCtaClicked = { viewModel.purchasePackage(context as Activity, plan.revenueCatPackage!!) },
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                TextButton(
+                    onClick = { viewModel.restorePurchases() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp)
+                ) {
+                    Text(text = stringResource(id = R.string.paywall_restore_purchases))
                 }
             }
 

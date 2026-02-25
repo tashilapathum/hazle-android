@@ -16,6 +16,7 @@ sealed class PurchaseState {
     data class Success(val storeTransaction: StoreTransaction) : PurchaseState()
     data class Failure(val message: String) : PurchaseState()
     object Cancelled : PurchaseState()
+    object Restored : PurchaseState()
 }
 
 /**
@@ -97,13 +98,31 @@ class PaywallViewModel(
         }
     }
 
+    fun restorePurchases() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(purchaseState = PurchaseState.InProgress) }
+            try {
+                val customerInfo = revenueCatRepository.restorePurchases()
+                _uiState.update {
+                    if (customerInfo.entitlements.active.isNotEmpty()) {
+                        it.copy(purchaseState = PurchaseState.Restored)
+                    } else {
+                        it.copy(purchaseState = PurchaseState.Failure("No active subscriptions found"))
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(purchaseState = PurchaseState.Failure(e.message ?: "An error occurred")) }
+            }
+        }
+    }
+
     fun resetPurchaseState() {
         _uiState.update { it.copy(purchaseState = PurchaseState.NotStarted) }
     }
 
     companion object {
-        private const val PACKAGE_MONTHLY = $$"$rc_monthly"
-        private const val PACKAGE_ANNUAL = $$"$rc_annual"
-        private const val PACKAGE_LIFETIME = $$"$rc_lifetime"
+        private const val PACKAGE_MONTHLY = "\$rc_monthly"
+        private const val PACKAGE_ANNUAL = "\$rc_annual"
+        private const val PACKAGE_LIFETIME = "\$rc_lifetime"
     }
 }

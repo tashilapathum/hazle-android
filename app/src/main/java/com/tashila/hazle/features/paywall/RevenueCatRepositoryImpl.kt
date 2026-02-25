@@ -11,6 +11,7 @@ import com.revenuecat.purchases.PurchasesTransactionException
 import com.revenuecat.purchases.awaitCustomerInfo
 import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
+import com.revenuecat.purchases.awaitRestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -43,6 +44,10 @@ class RevenueCatRepositoryImpl : RevenueCatRepository {
         } catch (e: PurchasesTransactionException) {
             null
         }
+    }
+
+    override suspend fun restorePurchases(): CustomerInfo {
+        return Purchases.sharedInstance.awaitRestore()
     }
 
     /**
