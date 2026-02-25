@@ -33,7 +33,6 @@ fun UpgradeCard(
     isSubscribed: Boolean,
     currentPlan: String? = null,
     onUpgradeClicked: () -> Unit = {},
-    onManageSubscriptionClicked: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -41,7 +40,7 @@ fun UpgradeCard(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .shadow(elevation = 8.dp, shape = MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
-        onClick = if (isSubscribed) onManageSubscriptionClicked else onUpgradeClicked,
+        onClick = onUpgradeClicked,
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         )

@@ -127,7 +127,6 @@ fun SettingsScreen(
                     isSubscribed = isSubscribed,
                     currentPlan = currentPlan,
                     onUpgradeClicked = { onUpgradeClicked.invoke() },
-                    onManageSubscriptionClicked = { openSubscriptionManagement(context) }
                 )
             }
 
@@ -282,14 +281,6 @@ fun openAppLanguageSettings(context: Context) {
 fun openAppNotificationSettings(context: Context) {
     val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
         putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
-    context.startActivity(intent)
-}
-
-fun openSubscriptionManagement(context: Context) {
-    val intent = Intent(Intent.ACTION_VIEW).apply {
-        data = "https://play.google.com/store/account/subscriptions".toUri()
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)

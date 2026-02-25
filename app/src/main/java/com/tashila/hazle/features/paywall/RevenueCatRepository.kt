@@ -12,6 +12,7 @@ interface RevenueCatRepository {
     val offerings: Flow<Offerings>
 
     suspend fun purchasePackage(activity: Activity, packageToPurchase: Package): PurchaseResult?
+    suspend fun restorePurchases(): CustomerInfo
 
     fun hasProAccess(customerInfo: CustomerInfo): Boolean
     fun hasVipAccess(customerInfo: CustomerInfo): Boolean

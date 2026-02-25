@@ -11,6 +11,9 @@ import com.revenuecat.purchases.PurchasesTransactionException
 import com.revenuecat.purchases.awaitCustomerInfo
 import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
+import com.revenuecat.purchases.awaitRestore
+import com.tashila.hazle.utils.ENTITLEMENT_PRO
+import com.tashila.hazle.utils.ENTITLEMENT_VIP
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -45,6 +48,10 @@ class RevenueCatRepositoryImpl : RevenueCatRepository {
         }
     }
 
+    override suspend fun restorePurchases(): CustomerInfo {
+        return Purchases.sharedInstance.awaitRestore()
+    }
+
     /**
      * Checks if the user has "pro" access based on their entitlements.
      * @param customerInfo The user's customer info.
@@ -61,10 +68,5 @@ class RevenueCatRepositoryImpl : RevenueCatRepository {
      */
     override fun hasVipAccess(customerInfo: CustomerInfo): Boolean {
         return customerInfo.entitlements[ENTITLEMENT_VIP]?.isActive == true
-    }
-
-    companion object {
-        private const val ENTITLEMENT_PRO = "Hazle Pro"
-        private const val ENTITLEMENT_VIP = "Hazle VIP"
     }
 }

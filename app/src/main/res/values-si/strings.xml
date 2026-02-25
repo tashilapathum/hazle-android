@@ -100,7 +100,7 @@
     <string name="paywall_subtitle">අපරිමිත පණිවුඩ හුවමාරුව සහ Cloud Sync සමඟින් ඔබේ වැඩකටයුතු වඩාත් කාර්යක්ෂම කරගන්න.</string>
     <string name="paywall_free_tier_title">නොමිලේ</string>
     <string name="paywall_free_tier_price">නොමිලේ</string>
-    <string name="paywall_free_tier_cta">වත්මන් සැලසුම</string>
+    <string name="paywall_free_tier_cta">නොමිලේ සේවාව</string>
     <string name="paywall_pro_tier_title">Pro සේවාව</string>
     <string name="paywall_pro_tier_price">මසකට රු. 1,490</string>
     <string name="paywall_pro_tier_subtitle">නැතහොත් වසරකට රු. 10,900 (40% ක ඉතිරියක්)</string>
@@ -148,5 +148,6 @@
     <string name="paywall_byok_feature_2">සියලුම Pro විශේෂාංග ජීවිත කාලයටම ලබා ගන්න</string>
     <string name="paywall_byok_feature_3">Cloud සමමුහුර්තකරණය ඇතුළත් වේ</string>
     <string name="paywall_byok_feature_4">ප්‍රමුඛතා පාරිභෝගික සහාය</string>
+    <string name="paywall_restore_purchases">මිලදී ගැනීම් ප්‍රතිෂ්ඨාපනය කරන්න</string>
 
 </resources>
