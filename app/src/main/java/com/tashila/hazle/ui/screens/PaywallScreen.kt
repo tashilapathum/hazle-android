@@ -1,6 +1,8 @@
 package com.tashila.hazle.ui.screens
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.tashila.hazle.R
 import com.tashila.hazle.features.paywall.PaywallViewModel
 import com.tashila.hazle.features.paywall.PurchaseState
@@ -59,6 +62,8 @@ fun PaywallScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val isSubscribed by viewModel.isSubscribed.collectAsState()
+    val currentPlan by viewModel.currentPlan.collectAsState()
 
     LaunchedEffect(uiState.purchaseState) {
         when (val state = uiState.purchaseState) {
@@ -182,20 +187,36 @@ fun PaywallScreen(
                     PlanCard(
                         plan = plan,
                         onCtaClicked = { viewModel.purchasePackage(context as Activity, plan.revenueCatPackage!!) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        isCurrentPlan = when (currentPlan) {
+                            "pro" if page == 1 -> true
+                            "lifetime" if page == 2 -> true
+                            else -> false
+                        }
                     )
                 }
             }
 
             item {
                 Spacer(modifier = Modifier.height(24.dp))
-                TextButton(
-                    onClick = { viewModel.restorePurchases() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 40.dp)
-                ) {
-                    Text(text = stringResource(id = R.string.paywall_restore_purchases))
+                if (isSubscribed) {
+                    TextButton(
+                        onClick = { openSubscriptionManagement(context) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 40.dp)
+                    ) {
+                        Text(text = stringResource(id = R.string.manage_subscription_title))
+                    }
+                } else {
+                    TextButton(
+                        onClick = { viewModel.restorePurchases() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 40.dp)
+                    ) {
+                        Text(text = stringResource(id = R.string.paywall_restore_purchases))
+                    }
                 }
             }
 
@@ -235,4 +256,12 @@ fun PaywallScreen(
             }
         }
     }
+}
+
+fun openSubscriptionManagement(context: Context) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = "https://play.google.com/store/account/subscriptions".toUri()
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
 }

@@ -35,16 +35,25 @@ fun PlanCard(
     plan: Plan,
     modifier: Modifier = Modifier,
     onCtaClicked: () -> Unit,
+    isCurrentPlan: Boolean = false,
 ) {
     Card(
         modifier = modifier.height(IntrinsicSize.Max),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        border = if (plan.isRecommended) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
+        border = if (plan.isRecommended || isCurrentPlan) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            if (plan.isRecommended) {
+            if (isCurrentPlan) {
+                Text(
+                    text = stringResource(id = R.string.paywall_current_plan),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            } else if (plan.isRecommended) {
                 Text(
                     text = stringResource(id = R.string.paywall_recommended),
                     color = MaterialTheme.colorScheme.primary,
@@ -93,7 +102,8 @@ fun PlanCard(
                     onClick = onCtaClicked,
                     modifier = Modifier.fillMaxWidth(),
                     colors = if (plan.isRecommended) ButtonDefaults.buttonColors() else ButtonDefaults.outlinedButtonColors(),
-                    border = if (!plan.isRecommended) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
+                    border = if (!plan.isRecommended) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null,
+                    enabled = !isCurrentPlan
                 ) {
                     Text(stringResource(id = plan.ctaText))
                 }

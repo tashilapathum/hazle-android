@@ -98,7 +98,7 @@
     <string name="paywall_subtitle">Optimiere deinen Workflow mit unbegrenzten Nachrichten und Cloud-Synchronisierung.</string>
     <string name="paywall_free_tier_title">Kostenlos</string>
     <string name="paywall_free_tier_price">0 € / Monat</string>
-    <string name="paywall_free_tier_cta">Aktueller Plan</string>
+    <string name="paywall_free_tier_cta">Frei-Zugang</string>
     <string name="paywall_pro_tier_title">Pro-Zugang</string>
     <string name="paywall_pro_tier_price">4,99 € / Monat</string>
     <string name="paywall_pro_tier_subtitle">oder 35,99 € / Jahr (40% Ersparnis)</string>
